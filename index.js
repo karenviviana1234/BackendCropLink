@@ -1,6 +1,13 @@
 import express  from 'express' 
 import  body_parser from 'body-parser'
 import cors from 'cors'
+import rutaValidacion from './src/routes/autenticacion.js'
+import { rutaDeActividad } from './src/routes/Actividad.route.js'
+import router from './src/routes/Finca.routes.js'
+import rutaProduccion from './src/routes/Produccion.routes.js'
+import rutaDeTipoRecurso from './src/routes/TipoRecurso.route.js'
+import rutaUsuario from './src/routes/Usuarios.route.js'
+import { rutaDeEmpleado } from './src/routes/Empleado.route.js'
 
 
 //servidor
@@ -14,8 +21,15 @@ servidor.listen(3000, () =>{
     console.log("esta funcionando en el puerto 3000")
 })
 
-//rutas
-
+//ruta
+servidor.use(rutaValidacion)
+servidor.use('/usuarios',rutaUsuario)
+servidor.use(rutaDeActividad)
+servidor.use(rutaDeTipoRecurso)
+servidor.use(rutaDeTipoRecurso)
+servidor.use(rutaProduccion)
+servidor.use(rutaDeEmpleado)
+servidor.use(router)
 //carpetas documentacion
 servidor.set('view engine', 'ejs');
 servidor.set('views','./views');
