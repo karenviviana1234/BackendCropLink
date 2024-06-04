@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentación de la API</title>
+</head>
+<body>
+
+    <h1>ACTIVIDAD</h1>
+    <br>
+
+    <h3>Requerimiento 1. Documentacion ENDPOINT REGISTRAR ACTIVIDAD</h3>
+    <table>
+        <tr><td>Número</td> <td>1</td></tr>
+        <tr><td>Nombre del Servicio</td> <td>Registrar la actividad</td></tr>
+        <tr><td>URL</td>  <td>/Registrara</td></tr>
+        <tr><td>Descripción</td>  <td>Permite registrar una actividad en la base de datos</td></tr>
+        <tr><td>Metodo HTTP</td>  <td>POST</td></tr>
+        <tr><td>Header</td>  <td>Token:token</td></tr>
+        <tr><td>Usuarios</td> <td>Administrador</td></tr>
+        <tr><td>Request json</td>  <td>{
+            "nombre_actividad":"abonar",
+            "tiempo":"10:20:50", 
+            "observaciones":"bien", 
+            "fk_id_variedad":1,
+            fk_id_tipo_recursos:2,1,
+             "valor_actividad":8000
+             
+        }</td></tr>
+        <tr><td>Respuesta json</td>  <td>   
+        Correcto: 
+        Status: 200
+        json:
+        {   
+        "status": 200,
+        "message": "se registro la actividad con exito",
+    }
+    <br>
+    Incorrecto:
+    
+    Status: 403
+    body:{
+        "status": 403,
+        "message" : "No se registrar la actividad"
+    }
+    <br>
+    Error: 
+    
+    Status: 500 
+    json: {
+        status: 500,
+        "message" : "Error en el sistema"
+    }
+    </td></tr>
+    <tr><td>Programador</td> <td>Daniel F Gonzalez - devdfg</td></tr>
+    </table>
+    <br>
+    <h3>Requerimiento 2. Documentacion ENDPOINT ACTUALIZAR ACTIVIDAD</h3>
+    <table>
+        <tr><td>Número</td> <td>2</td></tr>
+        <tr><td>Nombre del Servicio</td>  <td>Actualizar actividad</td></tr>
+        <tr><td>URL</td>  <td>/Actualizara/actividad/:id </td></tr>
+        <tr><td>Descripción</td>  <td>Permite actualizar una actividad existente en la base de datos por medio de su id</td></tr>
+        <tr><td>Metodo HTTP</td>  <td>PUT</td></tr>
+        <tr><td>Header</td>  <td>Token:token</td></tr>
+        <tr><td>Usuario</td><td>Administrador</td></tr>
+        <tr><td>Request json</td>  <td>{
+            "nombre_actividad":"abonar",
+            "tiempo":"10:20:50", 
+            "observaciones":"bien", 
+            "fk_id_variedad":1,
+             "valor_actividad":8000,
+             "fk_id_tipo_recursos":1,
+             "estado":"activo"
+        }</td></tr>
+        <tr><td>Respuesta json</td>  <td>   
+        Correcto: 
+        Status: 200
+        json:
+        {
+            "status": 200,
+            "message": "Actividad actualizada con éxito"
+        }
+    <br>
+    Incorrecto:
+    
+    Status: 404
+    body:{
+        "status": 404,
+        "message" : "No se encontro el registro para actualizar"
+    }
+    <br>
+    Error: 
+    
+    Status: 500 
+    json: {
+        "status": 500,
+        "message" : "Error en el sistema"
+    }
+    </td></tr>
+    <tr><td>Programador</td> <td>Daniel F Gonzalez - devdfg</td></tr>
+    </table>
+    
+    <h3>Requerimiento 3. Documentacion ENDPOINT DESACTIVAR ACTIVIDAD</h3>
+    <table>
+        <tr><td>Número</td> <td>3</td></tr>
+        <tr><td>Nombre del Servicio</td>  <td>Desactivar Actividad</td></tr>
+        <tr><td>URL</td>  <td>/Desactivara/actividad/:id</td></tr>
+        <tr><td>Descripción</td>  <td>Permite desactivar una actividad existente en la base de datos por medio de su id</td></tr>
+        <tr><td>Metodo HTTP</td>  <td>PUT</td></tr>
+        <tr><td>Header</td>  <td>Token:token</td></tr>
+        <tr><td>Usuario</td> <td>Administrador</td></tr>
+        <tr><td>Request json</td>  <td></td></tr>
+        <tr><td>Respuesta json</td>  <td>   
+        Correcto: 
+        Status: 200
+        json:
+        {
+            "status": 200,
+            "message": "Estado de la actividad cambiado a inactivo",
+            
+        }
+    <br>
+    Incorrecto:
+    
+    Status: 404
+    body:{
+        "status": 404,
+        "message" : "No se encontró la actividad"
+    }
+    <br>
+    Error: 
+    
+    Status: 500 
+    json: {
+        "status": 500,
+        "message" : "Error en el sistema"
+    }
+    </td></tr>
+    <tr><td>Programador</td> <td>Daniel F Gonzalez - devdfg</td></tr>
+    </table>
+    <h3>Requerimiento 4. Documentacion ENDPOINT BUSCAR ACTIVIDAD</h3>
+    <table>
+        <tr><td>Número</td> <td>4</td></tr>
+        <tr><td>Nombre del Servicio</td>  <td>Buscar Actividad</td></tr>
+        <tr><td>URL</td>  <td>/Buscar/actividad/:id</td></tr>
+        <tr><td>Descripción</td>  <td>Permite buscar una actividad por su id en la base de datos</td></tr>
+        <tr><td>Metodo HTTP</td>  <td>GET</td></tr>
+        <tr><td>Header</td>  <td>Token:token</td></tr>
+        <tr><td>Usuarios</td><td>Administrador,Empleado</td></tr>
+        <tr><td>Request json</td>  <td>{ null}</td></tr>
+        <tr><td>Respuesta json</td>  <td>   
+        Correcto: 
+        Status: 200
+        json:
+        [
+        {
+            "id_actividad": 4,
+            "nombre_actividad": "abonaremos",
+            "tiempo": "10:20:50",
+            "observaciones": "bien",
+            "valor_actividad": 8000,
+            "nombre_variedad": "cilantro",
+            fk_id_tipo_recursos":1,
+            "estado": "inactivo",
+            
+        }
+        ]
+    <br>
+    Incorrecto:
+    
+    Status: 404
+    body:{
+        "status": 404,
+        "message" : "No se encontraron resultados para la búsqueda."
+    }
+    <br>
+    Error: 
+    
+    Status: 500 
+    json: {
+        "status": 500,
+        "message" : "Error en el sistema"
+    }
+    </td></tr>
+    <tr><td>Programador</td> <td>Daniel F Gonzalez - devdfg</td></tr>
+    </table>
+    <h3>Requerimiento 5. Documentacion ENDPOINT LISTAR ACTIVIDAD</h3>
+    <table>
+        <tr><td>Número</td> <td>5</td></tr>
+        <tr><td>Nombre del Servicio</td>  <td>Listar Actividad</td></tr>
+        <tr><td>URL</td>  <td>/listara</td></tr>
+        <tr><td>Descripción</td>  <td>Permite obtener una lista de todas las actividades registradas en la base de datos</td></tr>
+        <tr><td>Metodo HTTP</td>  <td>GET</td></tr>
+        <tr><td>Header</td>  <td>Token:token</td></tr>
+        <tr><td>Usuarios</td> <td>Administrador,Empleado</td></tr>
+        <tr><td>Request json</td>  <td>Null</td></tr>
+        <tr><td>Respuesta json</td>  <td>   
+        Correcto: 
+        Status: 200
+        json:
+        [
+        {
+            "id_actividad": 4,
+            "nombre_actividad": "abonaremos",
+            "tiempo": "10:20:50",
+            "observaciones": "bien",
+            "valor_actividad": 8000,
+            "nombre_variedad": "cilantro",
+            "recursos":1,
+            "estado": "terminado"
+            
+        },
+        {
+            "id_actividad": 5,
+            "nombre_actividad": "abonar",
+            "tiempo": "10:20:50",
+            "observaciones": "bien",
+            "valor_actividad": 8000,
+            "nombre_variedad": "cilantro",
+            "recursos":13,2,
+            "estado": "activo"
+            
+        },
+        ]
+    <br>
+    Incorrecto:
+    
+    Status: 404
+    body:{
+        "status": 404,
+        "message" : "No hay actividades que listar"
+    }
+    <br>
+    Error: 
+    
+    Status: 500 
+    json: {
+        "status": 500,
+        "message" : "Error en el sistema"
+    }
+    </td></tr>
+    <tr><td>Programador</td> <td>Daniel F Gonzalez - devdfg</td></tr>
+    </table>
+   
