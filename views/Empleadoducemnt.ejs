@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentacion API</title>
+
+<body>
+    <hr>
+    <h1>USUARIO</h1>
+    <table>
+        <tr>
+            <td>Número</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>Nombre del Servicio</td>
+            <td>Listar Actividad Empleado</td>
+        </tr>
+        <tr>
+            <td>URI</td>
+            <td>http://localhost:3000/Listar</td>
+        </tr>
+        <tr>
+            <td>Descripcion</td>
+            <td>Permite listar las actividades registradas para el empleado que esta en la base de datos</td>
+        </tr>
+        <tr>
+            <td>Verbo HTTP</td>
+            <td>Verbo Get</td>
+        </tr>
+        <tr>
+            <td>Header</td>
+            <td>token:token</td>
+        </tr>
+        <tr>
+            <td>Request json</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Respuesta json</td>
+            <td>
+                Correcto:
+                status: 200 OK
+                {
+                "identificacion": 1231,
+                "nombre": "joseeee",
+                "fecha_inicio": "12-09-2024",
+                "fecha_fin": "22-09-2024",
+                "nombre_variedad": "cebolla",
+                "nombre_actividad": "recolectar",
+                "tiempo": 2,
+                "observaciones": "bien trabajadito"
+                }
+                <br>
+                Incorrecto:
+
+                404 Not Found
+                {
+                "status": 404,
+                "message": "El usuario no esta registrado"
+                }
+                <br>
+                Error:
+                status: 500 Internal Server Error
+                {
+                "status": 500,
+                "message": "Error en el sistema"
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Nombre Desarrollador:</td>
+            <td>Karen viviana Diaz Guevara</td>
+        </tr>
+    </table>
+    <hr> <br>
+    <table>
+        <tr>
+            <td>Número</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>Nombre del Servicio</td>
+            <td>Registrar Observacion</td>
+        </tr>
+        <tr>
+            <td>URI</td>
+            <td>http://localhost:3000/EmpleadoMood/Registrar/:id</td>
+        </tr>
+        <tr>
+            <td>Descripcion</td>
+            <td>Permite Registrar una observacion en la base de datos</td>
+        </tr>
+        <tr>
+            <td>Verbo HTTP</td>
+            <td>Verbo POST</td>
+        </tr>
+        <tr>
+            <td>Header</td>
+            <td>token:token</td>
+        </tr>
+        <tr>
+            <td>Request json</td>
+            <td>{
+                "observacion": ""
+                } </td>
+        </tr>
+        <tr>
+            <td>Respuesta json</td>
+            <td>
+                Correcto:
+                Status: 200 OK
+                {
+                "status": 200,
+                "message": "Se registró con exito el usuario nombre del usuario"
+                }
+                <br>
+                Incorrecto:
+
+                Status: 404 Not Found
+                {
+                "status": 404,
+                "mensaje": "No se registró el usuario"
+                }
+                <br>
+                Error:
+                status: 500 Internal Server Error
+                {
+                "status": 500,
+                "message": "Error en el sistema"
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Nombre Desarrollador:</td>
+            <td>Karen viviana Diaz Guevara</td>
+        </tr>
+    </table>
+  </body>
+
+</html>

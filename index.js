@@ -1,9 +1,14 @@
 import express  from 'express' 
 import  body_parser from 'body-parser'
 import cors from 'cors'
+import rutaValidacion from './src/routes/autenticacion.js'
+import rutaUsuario from './src/routes/Usuarios.route.js'
+import rutaProduccion from './src/routes/Produccion.routes.js'
+import { rutaDeEmpleado } from './src/routes/Empleado.route.js'
 
 
-//rutas
+
+
 
 
 //servidor
@@ -18,8 +23,10 @@ servidor.listen(3000, () =>{
 })
 
 //rutas
-
-
+servidor.use(rutaValidacion)
+servidor.use('/usuario',rutaUsuario)
+servidor.use(rutaProduccion)
+servidor.use(rutaDeEmpleado)
 //carpetas documentacion
 servidor.set('view engine', 'ejs');
 servidor.set('views','./views');

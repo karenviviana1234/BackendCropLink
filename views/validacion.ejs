@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentacion API</title>
+</head>
+<body>
+    
+
+    <table>
+        <tr>
+            <td>Número</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>Nombre del Servicio</td>
+            <td>Validación de usuario</td>
+        </tr>
+        <tr>
+            <td>URI</td>
+            <td>http://localhost:3000/validar</td>
+        </tr>
+        <tr>
+            <td>Descripcion</td>
+            <td>Permite ver el Token del Usuario</td>
+        </tr>
+        <tr>
+            <td>Verbo HTTP</td>
+            <td>Verbo Post</td>
+        </tr>
+        <tr>
+            <td>Header</td>
+            <td>null</td>
+        </tr>
+        <tr>
+            <td>Request json</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Respuesta json</td>
+            <td>
+                Correcto:
+                status: 200 OK
+                {
+                    "correo":"luci@12.com",
+                     "password":"lucifer"
+                }
+                <br>
+                Incorrecto:
+
+                404 Not Found
+                {
+                "status": 404,
+                "message": "Usuario no autorizado"
+                }
+                <br>
+                Error:
+                status: 500 Internal Server Error
+                {
+                "status": 500,
+                "message": "Error del servidor"
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Nombre Desarrollador:</td>
+            <td>Karen viviana Diaz Guevara</td>
+        </tr>
+    </table> 
+</body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentacion API</title>
+
+<body>
+    <hr>
+    <h1>PRODUCCIÓN</h1>
+    <table>
+        <tr>
+            <td>Número</td>
+            <td>1</td>
+        </tr>
+        <tr>
+            <td>Nombre del Servicio</td>
+            <td>Listar Producción</td>
+        </tr>
+        <tr>
+            <td>URI</td>
+            <td>http://localhost:3000/listarProduccion</td>
+        </tr>
+        <tr>
+            <td>Descripcion</td>
+            <td>Permite listar los Producción registrados en la base de datos</td>
+        </tr>
+        <tr>
+            <td>Verbo HTTP</td>
+            <td>Verbo Get</td>
+        </tr>
+        <tr>
+            <td>Header</td>
+            <td>token:token</td>
+        </tr>
+        <tr>
+            <td>Request json</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Respuesta json</td>
+            <td>
+                Correcto:
+                status: 200 OK
+
+                {
+                "id_producccion": 5,
+                "cantidad_produccion": 15000,
+                "precio": 9000,
+                "id_programacion": 12,
+                "fecha_inicio": "2022-02-15T12:00:00.000Z",
+                "fecha_fin": "2022-02-16T12:00:00.000Z",
+                "estado": "activo"
+                }
+                <br>
+                Incorrecto:
+
+                404 Not Found
+                {
+                "status": 404,
+                "message": "La Producción no esta registrado"
+                }
+                <br>
+                Error:
+                status: 500 Internal Server Error
+                {
+                "status": 500,
+                "message": "Error en el sistema"
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Nombre Desarrollador:</td>
+            <td>Karen viviana Diaz Guevara</td>
+        </tr>
+    </table>
+    <hr> <br>
+    <table>
+        <tr>
+            <td>Número</td>
+            <td>2</td>
+        </tr>
+        <tr>
+            <td>Nombre del Servicio</td>
+            <td>Registrar Producción</td>
+        </tr>
+        <tr>
+            <td>URI</td>
+            <td>http://localhost:3000/RegistraProduccion</td>
+        </tr>
+        <tr>
+            <td>Descripcion</td>
+            <td>Permite Registrar la Producción en la base de datos</td>
+        </tr>
+        <tr>
+            <td>Verbo HTTP</td>
+            <td>Verbo POST</td>
+        </tr>
+        <tr>
+            <td>Header</td>
+            <td>token:token</td>
+        </tr>
+        <tr>
+            <td>Request json</td>
+            <td>
+                {
+                "cantidad_produccion": "",
+                "precio": "",
+                "fk_id_programacion":""
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Respuesta json</td>
+            <td>
+                Correcto:
+                Status: 200 OK
+                {
+                "status": 200,
+                "message": "Se registró con exito el Producción."
+                }
+                <br>
+                Incorrecto:
+
+                Status: 404 Not Found
+                {
+                "status": 404,
+                "mensaje": "No se registró la Producción"
+                }
+                <br>
+                Error:
+                status: 500 Internal Server Error
+                {
+                "status": 500,
+                "message": "Error en el sistema"
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Nombre Desarrollador:</td>
+            <td>Karen viviana Diaz Guevara</td>
+        </tr>
+    </table>
+        <tr>
+            <td>Número</td>
+            <td>3</td>
+        </tr>
+        <tr>
+            <td>Nombre del Servicio</td>
+            <td>Desactivar Producción</td>
+        </tr>
+        <tr>
+            <td>URI</td>
+            <td>http://localhost:3000/desactivarProduccion/:id_producccion</td>
+        </tr>
+        <tr>
+            <td>Descripcion</td>
+            <td>Permite desactivar Producción en la base de datos</td>
+        </tr>
+        <tr>
+            <td>Verbo HTTP</td>
+            <td>Verbo POST</td>
+        </tr>
+        <tr>
+            <td>Header</td>
+            <td>token:token</td>
+        </tr>
+        <tr>
+            <td>Request json</td>
+            <td> </td>
+        </tr>
+        <tr>
+            <td>Respuesta json</td>
+            <td>
+                Correcto:
+                Status: 200 OK
+                {
+                "status": 200,
+                "mensaje": "Su Producción se desactivó con éxito"
+                }
+                <br>
+                Incorrecto:
+
+                Status: 404 Not Found
+                {
+                "status": 404,
+                "mensaje": "la Producción no se pudo desactivar"
+                }
+                <br>
+                Error:
+
+                Status: 500 Internal Server Error
+                {
+                status: 500,
+                "message" : "Error en el sistema"
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Nombre Desarrollador:</td>
+            <td>Karen viviana Diaz Guevara</td>
+        </tr>
+    </table>
+    <hr> <br>
+
+    <table>
+        <tr>
+            <td>Número</td>
+            <td>4</td>
+        </tr>
+        <tr>
+            <td>Nombre del Servicio</td>
+            <td>Actualizar Producción</td>
+        </tr>
+        <tr>
+            <td>URI</td>
+            <td>http://localhost:3000/ActualizarProduccion/:id_producccion</td>
+        </tr>
+        <tr>
+            <td>Descripcion</td>
+            <td>Permite Actualizar el Producción registrado en la base de datos</td>
+        </tr>
+        <tr>
+            <td>Verbo HTTP</td>
+            <td>Verbo PUT</td>
+        </tr>
+        <tr>
+            <td>Header</td>
+            <td>token:token</td>
+        </tr>
+        <tr>
+            <td>Request json</td>
+            <td>
+                {
+                    "cantidad_produccion": 8200,
+                    "precio": 5000,
+                    "fk_id_programacion":25
+                    }
+            </td>
+        </tr>
+        <tr>
+            <td>Respuesta json</td>
+            <td>
+                Correcto:
+                Status: 200 OK
+                {
+                status: 200,
+                "mensaje": "La Producción ha sido actualizado."
+                }
+                <br>
+                Status: 404 Not Found
+                {
+                "status": 404,
+                "mensaje": "No se pudo actualizar la Producción, inténtalo de nuevo."
+                }
+                <br>
+                Error:
+                status: 500 Internal Server Error
+                {
+                "status": 500,
+                "message" : "Error en el sistema"
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Nombre Desarrollador:</td>
+            <td>Karen viviana Diaz Guevara</td>
+        </tr>
+    </table>
+    <hr> <br>
+    <table>
+        <tr>
+            <td>Número</td>
+            <td>5</td>
+        </tr>
+        <tr>
+            <td>Nombre del Servicio</td>
+            <td>Buscar Producción</td>
+        </tr>
+        <tr>
+            <td>URI</td>
+            <td>http://localhost:3000/BuscarProduccion/:id_producccion</td>
+        </tr>
+        <tr>
+            <td>Descripcion</td>
+            <td>Permite buscar Producción registrados en la base de datos</td>
+        </tr>
+        <tr>
+            <td>Verbo HTTP</td>
+            <td>Verbo Get</td>
+        </tr>
+        <tr>
+            <td>Header</td>
+            <td> token:token</td>
+        </tr>
+        <tr>
+            <td>Request json</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>Respuesta json</td>
+            <td>
+                Correcto:
+                Status: 200 OK
+                {
+                    "id_producccion": 5,
+                    "cantidad_produccion": 15000,
+                    "precio": 9000,
+                    "id_programacion": 12,
+                    "fecha_inicio": "2022-02-15T12:00:00.000Z",
+                    "fecha_fin": "2022-02-16T12:00:00.000Z",
+                    "estado": "activo"
+                }
+                <br>
+                Incorrecto:
+
+                Status: 404 Internal Server Error
+                {
+                "status": 404,
+                "message" : "No se encontraron Producción con ese ID"
+                }
+                <br>
+                Error:
+
+                Status: 500 Internal Server Error
+                {
+                status: 500,
+                "message" : "Error en el sistema"
+                }
+            </td>
+        </tr>
+        <tr>
+            <td>Nombre Desarrollador:</td>
+            <td>Karen viviana Diaz Guevara</td>
+        </tr>
+    </table>
+</body>
+
+</html>
