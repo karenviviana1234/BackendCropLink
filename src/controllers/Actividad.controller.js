@@ -16,6 +16,7 @@ export const listarA = async (req, res) => {
   ac.valor_actividad,  
   v.nombre_variedad,
   GROUP_CONCAT(tr.nombre_recursos) AS nombre_recursos,
+  ac.observacion,
   ac.estado
 FROM 
   actividad AS ac 
