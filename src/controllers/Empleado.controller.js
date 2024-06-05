@@ -9,29 +9,33 @@ export const listarEmpleado = async (req, res) => {
     // Obtener todas las asignaciones relacionadas con el empleado
     const [result] = await pool.query(
       `
-            SELECT 
+        SELECT 
             u.identificacion,
-
-                u.nombre,
-                p.fecha_inicio,
-                p.fecha_fin,
-                v.nombre_variedad,
-                t.nombre_actividad,
-                t.tiempo,
-                t.observaciones
-            FROM 
-                programacion p
-            INNER JOIN 
-                cultivo c ON p.fk_id_cultivo = c.id_cultivo
-            INNER JOIN 
-                variedad v ON c.fk_id_variedad = v.id_variedad
-            INNER JOIN 
-                actividad t ON p.fk_id_actividad = t.id_actividad
-            INNER JOIN 
-                usuarios u ON p.fk_identificacion = u.identificacion
-            WHERE 
-                u.identificacion = ?;
-        `,
+            u.nombre,
+            p.fecha_inicio,
+            p.fecha_fin,
+            v.nombre_variedad,
+            a.nombre_actividad,
+            a.id_actividad,
+            a.tiempo,
+            a.observaciones,
+            a.estado,
+            p.estado
+        FROM 
+            programacion p
+        INNER JOIN 
+            lotes l ON p.fk_id_lote = l.id_lote
+        INNER JOIN 
+            cultivo c ON c.fk_id_lote = c.id_cultivo
+        INNER JOIN 
+            variedad v ON c.fk_id_variedad = v.id_variedad
+        INNER JOIN 
+            actividad a ON p.fk_id_actividad = a.id_actividad
+        INNER JOIN 
+            usuarios u ON p.fk_identificacion = u.identificacion
+        WHERE 
+            u.identificacion = ?;
+      `,
       [identificacion]
     );
 
@@ -49,6 +53,9 @@ export const listarEmpleado = async (req, res) => {
     });
   }
 };
+
+
+
 
 /* // Controlador para mostrar actividades asignadas a un empleado
 export const listarE = async (req, res) => {
@@ -125,174 +132,91 @@ export const RegistrarE = async (req, res) => {
 };
 
 //
+
+//para cambiar los estados y este va para los botones
 export const Empleado = async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { id } = req.params;
-
-    // Obtener la identificación del usuario autenticado
-    const identificacion = req.usuario;
-
-    // Verificar si la actividad existe en la tabla programacion y está asignada al usuario
-    const [programacionExist] = await pool.query(
-      "SELECT * FROM programacion WHERE fk_id_actividad = ? AND fk_identificacion = ?",
-      [id, identificacion]
-    );
-
-    // Verificar si se encontró la actividad asignada al usuario en la tabla programacion
-    if (programacionExist.length > 0) {
-      // Verificar si la actividad existe en la tabla actividad
-      const [oldActividad] = await pool.query(
-        "SELECT * FROM actividad WHERE id_actividad = ?",
-        [id]
-      );
-
-      if (oldActividad.length > 0) {
-        // Determinar el nuevo estado
-        let nuevoEstado;
-        switch (oldActividad[0].estado) {
-          case "activo":
-            nuevoEstado = "proceso";
-            break;
-          case "proceso":
-            nuevoEstado = "terminado";
-            break;
-          case "terminado":
-            nuevoEstado = "terminado"; // No hay siguiente estado después de terminado
-            break;
-          default:
-            nuevoEstado = oldActividad[0].estado;
-        }
-
-        // Actualizar el estado de la actividad en la base de datos
-        const [resultActividad] = await pool.query(
-          "UPDATE actividad SET estado = ? WHERE id_actividad = ?",
-          [nuevoEstado, id]
-        );
-
-        // Actualizar el estado en la tabla programacion
-        const [resultProgramacion] = await pool.query(
-          "UPDATE programacion SET estado = ? WHERE fk_id_actividad = ?",
-          [nuevoEstado, id]
-        );
-
-        // Verificar si se afectaron filas en ambas tablas
-        if (
-          resultActividad.affectedRows > 0 &&
-          resultProgramacion.affectedRows > 0
-        ) {
-          // Si se actualizó correctamente en ambas tablas, enviar una respuesta con estado 200
-          res.status(200).json({
-            status: 200,
-            message:
-              "Estado de la actividad y de la programación actualizados con éxito",
-            nuevoEstado: nuevoEstado,
-          });
-        } else {
-          // Si no se encontró el registro para actualizar en alguna de las tablas, enviar una respuesta con estado 404
-          res.status(404).json({
-            status: 404,
-            message:
-              "No se encontró la actividad o la programación para actualizar",
-          });
-        }
-      } else {
-        // Si no se encontró la actividad en la tabla actividad, enviar una respuesta con estado 404
-        res.status(404).json({
-          status: 404,
-          message: "No se encontró la actividad",
-        });
+      // Validate request
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
       }
-    } else {
-      // Si no se encontró la actividad asignada al usuario en la tabla programacion, enviar una respuesta con estado 404
-      res.status(404).json({
-        status: 404,
-        message:
-          "No se encontró la actividad asignada al usuario en la tabla programación",
-      });
-    }
+
+      const { id_actividad } = req.params;
+
+      // Verify if the activity exists
+      const [oldActividad] = await pool.query("SELECT * FROM actividad WHERE id_actividad = ?", [id_actividad]);
+
+      // Check if the activity was found
+      if (oldActividad.length > 0) {
+          // Determine the new state
+          let nuevoEstado;
+          switch (oldActividad[0].estado) {
+              case 'activo':
+                  nuevoEstado = 'proceso';
+                  break;
+              case 'proceso':
+                  nuevoEstado = 'terminado';
+                  break;
+              case 'terminado':
+                  nuevoEstado = 'terminado'; // No next state after terminado
+                  break;
+              default:
+                  nuevoEstado = oldActividad[0].estado;
+          }
+
+          // Only update if the state is actually changing
+          if (nuevoEstado !== oldActividad[0].estado) {
+              // Start a transaction
+              await pool.query("START TRANSACTION");
+
+              // Update the state of the activity in the database
+              const [resultActividad] = await pool.query(
+                  `UPDATE actividad SET estado = ? WHERE id_actividad = ?`, [nuevoEstado, id_actividad]
+              );
+
+              // Update the state in the programacion table
+              const [resultProgramacion] = await pool.query(
+                  `UPDATE programacion SET estado = ? WHERE fk_id_actividad = ?`, [nuevoEstado, id_actividad]
+              );
+
+              // Commit transaction if both updates were successful
+              if (resultActividad.affectedRows > 0 && resultProgramacion.affectedRows > 0) {
+                  await pool.query("COMMIT");
+                  res.status(200).json({
+                      status: 200,
+                      message: 'Estado de la actividad y de la programación actualizados con éxito',
+                      nuevoEstado: nuevoEstado
+                  });
+              } else {
+                  // Rollback transaction if any update failed
+                  await pool.query("ROLLBACK");
+                  res.status(404).json({
+                      status: 404,
+                      message: 'No se encontró la actividad o la programación para actualizar'
+                  });
+              }
+          } else {
+              res.status(200).json({
+                  status: 200,
+                  message: 'La actividad ya está en el estado finalizado',
+                  nuevoEstado: nuevoEstado
+              });
+          }
+      } else {
+          // If the activity was not found, return 404
+          res.status(404).json({
+              status: 404,
+              message: 'No se encontró la actividad'
+          });
+      }
   } catch (error) {
-    // Si hay algún error en el proceso, enviar una respuesta con estado 500
-    res.status(500).json({
-      status: 500,
-      message: "Error en el sistema: " + error.message,
-    });
+      // Rollback transaction in case of error
+      await pool.query("ROLLBACK");
+      // Return a 500 status with the error message
+      res.status(500).json({
+          status: 500,
+          message: 'Error en el sistema: ' + error.message
+      });
   }
 };
-
-/* //para cambiar los estados y este va para los botones
-export const Empleado = async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
-        }
-
-        const { id } = req.params;
-
-        // Verificar si la actividad existe
-        const [oldActividad] = await pool.query("SELECT * FROM actividad WHERE id_actividad = ?", [id]);
-
-        // Verificar si se encontró la actividad
-        if (oldActividad.length > 0) {
-            // Determinar el nuevo estado
-            let nuevoEstado;
-            switch (oldActividad[0].estado) {
-                case 'activo':
-                    nuevoEstado = 'proceso';
-                    break;
-                case 'proceso':
-                    nuevoEstado = 'terminado';
-                    break;
-                case 'terminado':
-                    nuevoEstado = 'terminado'; // No hay siguiente estado después de terminado
-                    break;
-                default:
-                    nuevoEstado = oldActividad[0].estado;
-            }
-
-            // Actualizar el estado de la actividad en la base de datos
-            const [resultActividad] = await pool.query(
-                `UPDATE actividad SET estado = ? WHERE id_actividad = ?`, [nuevoEstado, id]
-            );
-
-            // Actualizar el estado en la tabla programacion
-            const [resultProgramacion] = await pool.query(
-                `UPDATE programacion SET estado = ? WHERE fk_id_actividad = ?`, [nuevoEstado, id]
-            );
-
-            // Verificar si se afectaron filas en ambas tablas
-            if (resultActividad.affectedRows > 0 && resultProgramacion.affectedRows > 0) {
-                // Si se actualizó correctamente en ambas tablas, enviar una respuesta con estado 200
-                res.status(200).json({
-                    status: 200,
-                    message: 'Estado de la actividad y de la programación actualizados con éxito',
-                    nuevoEstado: nuevoEstado
-                });
-            } else {
-                // Si no se encontró el registro para actualizar en alguna de las tablas, enviar una respuesta con estado 404
-                res.status(404).json({
-                    status: 404,
-                    message: 'No se encontró la actividad o la programación para actualizar'
-                });
-            }
-        } else {
-            // Si no se encontró la actividad, enviar una respuesta con estado 404
-            res.status(404).json({
-                status: 404,
-                message: 'No se encontró la actividad'
-            });
-        }
-    } catch (error) {
-        // Si hay algún error en el proceso, enviar una respuesta con estado 500
-        res.status(500).json({
-            status: 500,
-            message: 'Error en el sistema: ' + error.message
-        });
-    }
-};
-  */
