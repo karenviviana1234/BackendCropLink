@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../public/estilos.css">
+    <title>Documentación de la api auto registrer</title>
+</head>
+<body>
+    //3
+    <h1>Documentacion de auto registrer</h1>
+    <hr>
+    <hr>
+    <h3>Requerimiento 1. Documentacion listar Lotes</h3>
+    <table>
+        <tr><td>NUMERO</td><td>1</td></tr>
+        <tr><td>NOMBRE DEL SERVICIO</td><td>listarlotes</td></tr>
+        <tr><td>URI</td><td>/listarlote</td></tr>
+        <tr><td>DESCRIPCION</td><td>permite listar a los lotes registrados en la base de datos</td></tr>
+        <tr><td>VERBO HTTP</td><td>GET</td></tr>
+        <tr><td>HEADER</td><td>Token</td></tr>
+        <tr><td>USUARIO</td><td>administrador</td></tr>
+        <tr><td>REUEST json/ PETICION BODY</td><td></td></tr>
+        <tr><td>RESPUESTA json</td><td>
+            correcto:
+            status:200
+            json:
+            {
+            "id_lote":1,
+            "nombre":"casa blanca", 
+            "longitud":"25km2", 
+            "latitud":"30m", 
+            "fk_id_finca":1, 
+            "estado":2
+            
+            },
+
+              incorrecto:
+              status:404
+              body:
+                status : 404{
+                "mensaje": "no se pudo mostar hay algun error"
+                }
+
+              error:
+              status:500
+              body:{
+                "mensaje" : error
+              }
+
+        </td></tr>
+        <tr>REALIZACION DE ACTIVIDAD<td></td><td>KEVIN FERNANDO ANDRADE MAHECHA </td></tr>
+        <tr>RAMA HITHUB<td></td><td> devkfm </td></tr>
+    </table>
+
+    <hr>
+    <h3>Requerimiento 2. registrar Lotes</h3>
+    <table>
+      <tr><td>NUMERO</td><td>2</td></tr>
+      <tr><td>NOMBRE DEL SERVICIO</td><td>Registrarlotes</td></tr>
+      <tr><td>URI</td><td>/Registrarlote</td></tr>
+      <tr><td>DESCRIPCION</td><td>permite crear lotes subiendolos a la base de datos</td></tr>
+      <tr><td>VERBO HTTP</td><td>post</td></tr>
+      <tr><td>HEADER</td><td>Token</td></tr>
+      <tr><td>USUARIO</td><td>administrador</td></tr>
+      <tr><td>REUEST json/ PETICION BODY</td><td>
+        { 
+            "nombre":"las mañanas", 
+            "longitud":"12km2", 
+            "latitud":"80m", 
+            "fk_id_finca":2, 
+            "estado":1 }</td></tr>
+      <tr><td>RESPUESTA json</td><td>
+
+          correcto:
+          status:200
+          json:
+          {
+            "mensaje": "  Lotes registrada con exito"
+          },
+
+            incorrecto:
+            status:404
+            body:
+              status:404{
+              "mensaje": "hay un error no se pudo guardar"
+            }
+
+            error:
+            status:500
+            body:{
+              "mensaje":error
+            }
+
+      </td></tr>
+      <tr>REALIZACION DE ACTIVIDAD<td></td><td>KEVIN FERNANDO ANDRADE MAHECHA </td></tr>
+      <tr>RAMA HITHUB<td></td><td> devkfm </td></tr>
+  </table>
+
+  <hr>
+  <h3>Requerimiento 3. Actualizar lotes</h3>
+  <table>
+    <tr><td>NUMERO</td><td>3</td></tr>
+    <tr><td>NOMBRE DEL SERVICIO</td><td>Actualizarlote</td></tr>
+    <tr><td>URI</td><td>/Actualizarlote/1</td></tr>
+    <tr><td>DESCRIPCION</td><td>permite modificar informacion en las programaciones registradas en la base de datos</td></tr>
+    <tr><td>VERBO HTTP</td><td>PUT</td></tr>
+    <tr><td>HEADER</td><td>Token</td></tr>
+    <tr><td>USUARIO</td><td>administrador</td></tr>
+    <tr><td>REUEST json/ PETICION BODY</td><td>{"nombre":"casa juncal" }</td></tr>
+    <tr><td>RESPUESTA json</td><td>
+        correcto:
+        status:200
+        json:
+        {
+          "mensaje": "ha sido actualizado"
+        },
+
+          incorrecto:
+          status:404
+          body:
+            status:404{
+            "mensaje": "No se pudo actualizar"
+          }
+
+          error:
+          status:500
+          body:{
+            "mensaje":error
+          }
+
+    </td></tr>
+    <tr>REALIZACION DE ACTIVIDAD<td></td><td>KEVIN FERNANDO ANDRADE MAHECHA </td></tr>
+    <tr>RAMA HITHUB<td></td><td> devkfm </td></tr>
+</table>
+
+<hr>
+<h3>Requerimiento 4. Buscar lotes</h3>
+<table>
+  <tr><td>NUMERO</td><td>4</td></tr>
+  <tr><td>NOMBRE DEL SERVICIO</td><td>Buscarlote</td></tr>
+  <tr><td>URI</td><td>/Buscarlote/1</td></tr>
+  <tr><td>DESCRIPCION</td><td>permite mostar datos especificos registrados en la base de datos</td></tr>
+  <tr><td>VERBO HTTP</td><td>GET</td></tr>
+  <tr><td>HEADER</td><td>Token</td></tr>
+  <tr><td>USUARIO</td><td>administrador</td></tr>
+  <tr><td>REUEST json/ PETICION BODY</td><td></td></tr>
+  <tr><td>RESPUESTA json</td><td>
+      correcto:
+      status:200
+      json:
+      {
+        "id_lote":1,
+        "nombre":"casa juncal", 
+        "longitud":"25km2", 
+        "latitud":"30m", 
+        "fk_id_finca":1, 
+        "estado":2
+      }
+
+        incorrecto:
+        status:404
+        body:
+          status:404{
+          "mensaje": "No se encontró nada con ese ID"
+        }
+
+        error:
+        status:500
+        body:{
+          "mensaje":error
+        }
+
+  </td></tr>
+  <tr>REALIZACION DE ACTIVIDAD<td></td><td>KEVIN FERNANDO ANDRADE MAHECHA </td></tr>
+  <tr>RAMA HITHUB<td></td><td> devkfm </td></tr>
+</table>
+
+<hr>
+<h3>Requerimiento 5. eliminar Lotes</h3>
+<table>
+  <tr><td>NUMERO</td><td>5</td></tr>
+  <tr><td>NOMBRE DEL SERVICIO</td><td>eliminarlotelote</td></tr>
+  <tr><td>URI</td><td>/desactivarlote/1</td></tr>
+  <tr><td>DESCRIPCION</td><td>permite eliminarlote la informacion registrada en la base de datos</td></tr>
+  <tr><td>VERBO HTTP</td><td>DELETE</td></tr>
+  <tr><td>HEADER</td><td>Token</td></tr>
+  <tr><td>USUARIO</td><td>administrador</td></tr>
+  <tr><td>REUEST json/ PETICION BODY</td><td></td></tr>
+  <tr><td>RESPUESTA json</td><td>
+      correcto:
+      status:200
+      json:
+      {
+        "mensaje": "desactivado con exito"
+      },
+
+        incorrecto:
+        status:404
+        body:
+          status:404{
+          "mensaje": "No se pudo desactivar"
+        }
+
+        error:
+        status:500
+        body:{
+          "mensaje":error
+        }
+
+  </td></tr>
+  <tr>REALIZACION DE ACTIVIDAD<td></td><td>KEVIN FERNANDO ANDRADE MAHECHA </td></tr>
+  <tr>RAMA HITHUB<td></td><td> devkfm </td></tr>
+</table>
+    
+<h3>Requerimiento 6. desactivar Lotes</h3>
+<table>
+  <tr><td>NUMERO</td><td>5</td></tr>
+  <tr><td>NOMBRE DEL SERVICIO</td><td>desactivarlote</td></tr>
+  <tr><td>URI</td><td>/desactivarlote/1</td></tr>
+  <tr><td>DESCRIPCION</td><td>permite desactivarlote la informacion registrada en la base de datos</td></tr>
+  <tr><td>VERBO HTTP</td><td>PUT</td></tr>
+  <tr><td>HEADER</td><td>Token</td></tr>
+  <tr><td>USUARIO</td><td>administrador</td></tr>
+  <tr><td>REUEST json/ PETICION BODY</td><td></td></tr>
+  <tr><td>RESPUESTA json</td><td>
+      correcto:
+      status:200
+      json:
+        status: 200,{
+                "mensaje": "El lote con el id "+id_lote+" ha sido desactivado."
+            };
+
+        incorrecto:
+        status:404
+        json:
+        {
+          "message": "No se pudo desactivar el lote"
+        }
+        
+        error
+        status:500
+        json:
+        {
+            message: 'Error en el sistema: '+error
+        }
+    
+  </td></tr>
+  <tr>REALIZACION DE ACTIVIDAD<td></td><td>KEVIN FERNANDO ANDRADE MAHECHA </td></tr>
+  <tr>RAMA HITHUB<td></td><td> devkfm </td></tr>
+</table>
+
+</body>
+</html>
