@@ -13,6 +13,8 @@ import Rutainversiones from './src/routes/Inversiones.route.js'
 import rutalote from './src/routes/lotes.routes.js'
 import rutaDeVariedad from './src/routes/variedad.routes.js'
 import rutaProgramacion from './src/routes/programacion.routes.js'
+import rutaCultivos from './src/routes/Cultivos.routes.js'
+import rutaCostos from './src/routes/Costos.routes.js'
 
 
 //servidor
@@ -40,6 +42,8 @@ servidor.use(Rutainversiones)
 servidor.use(rutalote)
 servidor.use(rutaDeVariedad)
 servidor.use(rutaProgramacion)
+servidor.use(rutaCultivos)
+servidor.use(rutaCostos)
 
 
 //carpetas documentacion
