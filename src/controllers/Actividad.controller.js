@@ -9,6 +9,7 @@ export const listarA = async (req, res) => {
 
     const sql = `
      SELECT 
+     ac.*,
   ac.id_actividad, 
   ac.nombre_actividad, 
   ac.tiempo, 
@@ -50,6 +51,7 @@ GROUP BY
     });
   }
 };
+
 
 
 // Controlador para registrar actividades
@@ -353,17 +355,15 @@ export const DesactivarA = async (req, res) => {
         [nuevoEstadoActividad, id]
       );
 
-      // Si se está desactivando la actividad, desactivar también la programación asociada
-      if (nuevoEstadoActividad === "inactivo") {
-        await pool.query(
-          `UPDATE programacion SET estado = ? WHERE fk_id_actividad = ?`,
-          ["inactivo", id]
-        );
-      }
+      // Actualizar el estado de la programación asociada
+      await pool.query(
+        `UPDATE programacion SET estado = ? WHERE fk_id_actividad = ?`,
+        [nuevoEstadoActividad, id]
+      );
 
       res.status(200).json({
         status: 200,
-        message: `Estado de la actividad cambiado a ${nuevoEstadoActividad}`,
+        message: `Estado de la actividad y de la programación asociada cambiado a ${nuevoEstadoActividad}`,
       });
     } else {
       // Si la variedad está inactiva, no se puede cambiar el estado de la actividad
@@ -379,6 +379,7 @@ export const DesactivarA = async (req, res) => {
     });
   }
 };
+
 
 
  
