@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentacion API</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <h1>Documentacion de la API</h1>
+  <hr>
+  <h3>Requerimiento . Documentacion COSTOS</h3>
+<table>
+  <tr><td>Número</td> <td>1</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Listar costos</td></tr>
+  <tr><td>URI</td>  <td>/listar</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite listar los costos registrados en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo GET</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td>  <td> </td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+    json:
+    {
+        "id_costos": 1,
+        "precio": "100.78",
+        "fk_id_actividad": 2,
+        "fk_id_tipo_recursos": 1
+      }
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message" : "No se encontraron costos."
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+<hr> <br>
+<table>
+  <tr><td>Número</td> <td>2</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Registrar costos</td></tr>
+  <tr><td>URI</td>  <td>/registrar</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite registrar costos en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo POST</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td> <td>   {
+    "precio": "100.78",
+    "fk_id_actividad": 2,
+    "fk_id_tipo_recursos": 1
+  } </td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+    json:
+    {
+        "id_costos": 1,
+        "precio": "100.78",
+        "fk_id_actividad": 2,
+        "fk_id_tipo_recursos": 1
+      }
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message" : "Fallo el registro de sus costos"
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+<hr><br>
+<table>
+  <tr><td>Número</td> <td>3</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Actualizar costos</td></tr>
+  <tr><td>URI</td>  <td>/actualizar/id_costos</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite actualizar costos en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo PUT</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td>  <td>    {
+    "precio": "100.78",
+    "fk_id_actividad": 2,
+    "fk_id_tipo_recursos": 1
+  } </td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+    json:
+    {
+        "id_costos": 1,
+        "precio": "100.78",
+        "fk_id_actividad": 2,
+        "fk_id_tipo_recursos": 1
+      }
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message": "No se pudo actualizar la información!"
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+<hr> <br>
+<table>
+  <tr><td>Número</td> <td>4</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Buscar costos</td></tr>
+  <tr><td>URI</td>  <td>/buscar/id_cultivo</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite buscar los costos registrados en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo GET</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td>  <td></td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+    json:
+    {
+        "id_costos": 1,
+        "precio": "100.78",
+        "fk_id_actividad": 2,
+        "fk_id_tipo_recursos": 1
+      }
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message" : "No se encontraron cultivos con ese ID"
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+</body>
+</html>
