@@ -8,6 +8,7 @@ export const listarProduccion = async (req, res) => {
 
         let sql = `
         SELECT 
+        produ.*,
             produ.id_producccion,
             produ.cantidad_produccion, 
             produ.precio, 

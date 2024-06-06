@@ -8,6 +8,7 @@ export const listarInversiones = async (req, res) => {
 
         let sql = `
             SELECT 
+            inver.*,
                 inver.id_inversiones AS id_inversiones,
                 l.nombre AS nombre_lote, 
                 cu.id_cultivo,
