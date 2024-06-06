@@ -16,10 +16,8 @@ export const listarEmpleado = async (req, res) => {
             p.fecha_fin,
             v.nombre_variedad,
             a.nombre_actividad,
-            a.id_actividad,
             a.tiempo,
             a.observaciones,
-            a.estado,
             p.estado
         FROM 
             programacion p
