@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 
 export const listarEmpleado = async (req, res) => {
   try {
-    // Obtener la identificación del usuario autenticado
+    // Obtener la identificación del usuario autenticados
     const identificacion = req.usuario;
 
     // Obtener todas las asignaciones relacionadas con el empleado
