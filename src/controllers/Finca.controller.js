@@ -167,19 +167,24 @@ export const desactivarF = async (req, res) => {
             nuevoEstado = 'activo'; // Si estaba inactivo, se activa
         }
 
-              // Actualiza el estado de la finca
-              await pool.query("UPDATE finca SET estado = ? WHERE id_finca = ?", [nuevoEstado, id_finca]);
+        // Actualiza el estado de la finca
+        await pool.query("UPDATE finca SET estado = ? WHERE id_finca = ?", [nuevoEstado, id_finca]);
 
-              // Actualiza el estado de los lotes relacionados
-              await pool.query("UPDATE lotes SET estado = ? WHERE fk_id_finca = ?", [nuevoEstado, id_finca]);
-      
-              // Actualiza el estado de los cultivos relacionados
+        // Actualiza el estado de los lotes relacionados
+        await pool.query("UPDATE lotes SET estado = ? WHERE fk_id_finca = ?", [nuevoEstado, id_finca]);
+
+        // Actualiza el estado de las variedades relacionadas
+        await pool.query("UPDATE variedad SET estado = ? WHERE id_variedad IN (SELECT fk_id_variedad FROM programacion WHERE fk_id_lote IN (SELECT id_lote FROM lotes WHERE fk_id_finca = ?))", [nuevoEstado, id_finca]);
+    
+        // Actualiza el estado de los cultivos relacionados
         await pool.query("UPDATE cultivo SET estado = ? WHERE fk_id_lote IN (SELECT id_lote FROM lotes WHERE fk_id_finca = ?)", [nuevoEstado, id_finca]);
 
-              // Actualiza el estado de las programaciones relacionadas
-              await pool.query("UPDATE programacion SET estado = ? WHERE fk_id_lote IN (SELECT id_lote FROM lotes WHERE fk_id_finca = ?)", [nuevoEstado, id_finca]);
-      
-    
+        // Actualiza el estado de las programaciones relacionadas
+        await pool.query("UPDATE programacion SET estado = ? WHERE fk_id_lote IN (SELECT id_lote FROM lotes WHERE fk_id_finca = ?)", [nuevoEstado, id_finca]);
+
+        // Actualiza el estado de las actividades relacionadas
+        await pool.query("UPDATE actividad SET estado = ? WHERE id_actividad IN (SELECT fk_id_actividad FROM programacion WHERE fk_id_lote IN (SELECT id_lote FROM lotes WHERE fk_id_finca = ?))", [nuevoEstado, id_finca]);
+
         // Confirma la transacción
         await pool.query("COMMIT");
 
@@ -195,4 +200,5 @@ export const desactivarF = async (req, res) => {
             message: error.message || 'Error en el sistema',
         });
     }
-}
+};
+
