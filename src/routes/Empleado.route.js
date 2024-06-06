@@ -7,7 +7,7 @@ import {validarToken} from "../controllers/autenticacion.js";
 
 const rutaDeEmpleado = Router()
 
-//localhost:3000/empleado
+//localhost:3000/empleadosssss
  rutaDeEmpleado.get("/Listar",validarToken, listarEmpleado); 
 rutaDeEmpleado.put("/EmpleadoMood/Registrar/:id",validarToken,validarRR, RegistrarE);
 rutaDeEmpleado.put("/cambioestado/:id_actividad",  Empleado);
