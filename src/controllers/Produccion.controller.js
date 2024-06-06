@@ -7,21 +7,25 @@ export const listarProduccion = async (req, res) => {
         const adminId = req.usuario;
 
         let sql = `
-            SELECT 
-                produ.id_producccion,
-                produ.cantidad_produccion, 
-                produ.precio, 
-                produ.fk_id_programacion AS id_programacion,  
-                pro.fecha_inicio, 
-                pro.fecha_fin,
-                produ.estado
-            FROM 
-                produccion AS produ
-            JOIN 
-                programacion AS pro ON produ.fk_id_programacion = pro.id_programacion
-            WHERE
-                pro.admin_id = ?;
-        `;
+        SELECT 
+            produ.id_producccion,
+            produ.cantidad_produccion, 
+            produ.precio, 
+            produ.fk_id_programacion AS id_programacion,  
+            pro.fecha_inicio, 
+            pro.fecha_fin,
+            produ.fk_id_inversiones AS id_inversiones,
+            inv.valor_inversion,
+            produ.estado
+        FROM 
+            produccion AS produ
+        JOIN 
+            programacion AS pro ON produ.fk_id_programacion = pro.id_programacion
+        JOIN 
+            inversiones AS inv ON produ.fk_id_inversiones = inv.id_inversiones
+        WHERE
+            pro.admin_id = ?;
+    `;
 
         const [listar] = await pool.query(sql, [adminId]);
 

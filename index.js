@@ -8,6 +8,8 @@ import rutaProduccion from './src/routes/Produccion.routes.js'
 import rutaDeTipoRecurso from './src/routes/TipoRecurso.route.js'
 import rutaUsuario from './src/routes/Usuarios.route.js'
 import { rutaDeEmpleado } from './src/routes/Empleado.route.js'
+import rutaFinca from './src/routes/Finca.routes.js'
+import Rutainversiones from './src/routes/Inversiones.route.js'
 
 
 //servidor
@@ -30,6 +32,8 @@ servidor.use(rutaDeTipoRecurso)
 servidor.use(rutaProduccion)
 servidor.use(rutaDeEmpleado)
 servidor.use(router)
+servidor.use('/finca',rutaFinca)
+servidor.use(Rutainversiones)
 //carpetas documentacion
 servidor.set('view engine', 'ejs');
 servidor.set('views','./views');
