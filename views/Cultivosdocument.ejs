@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentacion API</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <h1>Documentacion de la API</h1>
+  <hr>
+  <h3>Requerimiento . Documentacion CULTIVOS</h3>
+<table>
+  <tr><td>Número</td> <td>1</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Listar cultivos</td></tr>
+  <tr><td>URI</td>  <td>/listarCultivos</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite listar los cultivos registrados en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo GET</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td>  <td> </td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+    json:
+    {
+      "id_cultivo": 1,
+        "fecha_inicio": "2024-10-19T05:00:00.000Z",
+        "cantidad_sembrada": 621,
+        "nombre_lote": "alejo",
+        "nombre_variedad": "cilantro",
+        "estado": "inactivo"
+    }
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message" : "No se encontraron cultivos."
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+<hr> <br>
+<table>
+  <tr><td>Número</td> <td>2</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Registrar cultivos</td></tr>
+  <tr><td>URI</td>  <td>/registrarCultivos</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite registrar cultivos en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo POST</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td> <td>  {
+    { "fecha_inicio": "2022-10-19T05:00:00.000Z", 
+"cantidad_sembrada": 89, 
+"fk_id_lote": 1, 
+"fk_id_variedad": 3 }
+  } </td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+   message: se registro con exito el cultivo
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message" : "Fallo el registro de su cultivo"
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+<hr><br>
+<table>
+  <tr><td>Número</td> <td>3</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Actualizar cultivos</td></tr>
+  <tr><td>URI</td>  <td>/actualizarCultivos/id_cultivo</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite actualizar cultivos en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo PUT</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td>  <td>  {
+    "fecha_inicio": "2023-07-19T05:00:00.000Z",
+    "cantidad_sembrada": 24,
+    "fk_id_lote": 1,
+    "fk_id_variedad": 1
+  } </td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+    message:'La información ha sido actualizada'
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message": "No se pudo actualizar la información!"
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+<hr> <br>
+<table>
+  <tr><td>Número</td> <td>4</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Buscar cultivos</td></tr>
+  <tr><td>URI</td>  <td>/buscarCultivos/id_cultivo</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite buscar los cultivos registrados en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo GET</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td>  <td></td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+    json:
+    
+    {
+        "id_cultivo": 2,
+        "fecha_inicio": "2024-10-19T05:00:00.000Z",
+        "cantidad_sembrada": 621,
+        "nombre_lote": "alejo",
+        "nombre_variedad": "cilantro",
+        "estado": "activo"
+    }
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message" : "No se encontraron cultivos con ese ID"
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+<hr> <br>
+<table>
+  <tr><td>Número</td> <td>5</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Desactivar cultivos</td></tr>
+  <tr><td>URI</td>  <td>/desactivarCultivos/id_cultivo</td></tr>
+  <tr><td>Descripcion</td>  <td>Permite desactivar los cultivos registrados en la base de datos</td></tr>
+  <tr><td>Verbo HTTP</td>  <td>Verbo POST</td></tr>
+  <tr><td>Header:</td>  <td>token:token </td></tr>
+  <tr><td>Request json</td>  <td></td></tr>
+  <tr><td>Respuesta json</td>  <td>	
+    Correcto: 
+    Status: 200
+    body:{
+      "status": 200
+      "message" : "Se desactivo con éxito"
+    }
+  <br>
+Incorrecto:
+
+Status: 404
+body:{
+  "status": 404
+  "message" : "No se encontro el cultivo para desactivar"
+}
+<br>
+Error: 
+
+Status: 500 
+json: {
+  status: 500
+  "message" : "Error en el sistema"
+}
+</td></tr>
+<tr><td>Nombre Desarrollador:</td> <td>Sharit Daniela Vargas Almario (devsdv)</td></tr>
+</table>
+</body>
+</html>
