@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentacion API</title>
+  <link rel="stylesheet" href="style.css">
+<body>
+  <hr>
+  //4
+  <h3>Requerimiento 1. Documentacion ENDPOINT REGISTRAR PROGRAMACIONES</h3>
+  <table>
+      <tr><td>Número</td> <td>1</td></tr>
+      <tr><td>Nombre del Servicio</td>  <td>registrar programaciones</td></tr>
+      <tr><td>URL</td>  <td>/registrarProgramacion</td></tr>
+      <tr><td>Descripción</td>  <td>Permite registrar una nueva programacion utilizado en la base de datos</td></tr>
+      <tr><td>Metodo HTTP</td>  <td>POST</td></tr>
+      <tr><td>Header</td>  <td>Token:</td></tr>
+      <tr><td>Usuarios</td>  <td>Administrador</td></tr>
+      <tr><td>Request json</td>  <td>{
+        "fecha_inicio": "2024-12-11", 
+        "fecha_fin": "2024-12-12", 
+        "fk_id_usuario": 1, 
+        "fk_id_actividad": 1,
+        "fk_id_cultivo": 3,
+      }</td></tr>
+      <tr><td>Respuesta json</td>  <td>   
+      Correcto: 
+      Status: 200
+      json:
+      {
+        "status": 200,
+        "message": "Se registró con éxito"
+      }
+  <br>
+  Incorrecto:
+  
+  Status: 404
+  json:{
+      "status": 404,
+      "message" : "No se registró"
+  }
+  <br>
+  Error: 
+  
+  Status: 500 
+  json: {
+      "status": 500,
+      "message" : "Error interno del servidor"
+  }
+  </td></tr>
+  <tr><td>Programador</td>  <td>Dario Jose Zamora V - devdjzv</td></tr>
+  </table>
+  
+  
+  
+  <br>
+  
+  
+  
+  
+  <h3>Requerimiento 2. Documentacion ENDPOINT ACTUALIZAR PROGRAMACIONES</h3>
+  <table>
+      <tr><td>Número</td> <td>2</td></tr>
+      <tr><td>Nombre del Servicio</td>  <td>Actualizar programaciones</td></tr>
+      <tr><td>URL</td>  <td>actualizarProgramacion/:id</td></tr>
+      <tr><td>Descripción</td>  <td>Permite actualizar una asiganción existente en la base de datos</td></tr>
+      <tr><td>Metodo HTTP</td>  <td>PUT</td></tr>
+      <tr><td>Header</td>  <td>Token:</td></tr>
+      <tr><td>Usuarios</td>  <td>Administrador</td></tr>
+      <tr><td>Request json</td>  <td>{
+        "fecha_inicio": "2050-12-11", 
+        "fecha_fin": "2050-12-12", 
+        "fk_id_usuario": 1, 
+        "fk_id_actividad": 1,
+        "fk_id_cultivo": 3,
+        "estado": "acabo"
+      }</td></tr>
+      <tr><td>Respuesta json</td>  <td>   
+      Correcto: 
+      Status: 200
+      json:
+      {
+        "status": 200,
+        "message": "Se actualizó con éxito"
+      }
+  <br>
+  Incorrecto:
+  
+  Status: 404
+  json:{
+      "status": 404,
+      "message" : "No se encontró el registro para actualizar"
+  }
+  <br>
+  Error: 
+  
+  Status: 500 
+  json: {
+      "status": 500,
+      "message" : "Error interno del servidor"
+  }
+  </td></tr>
+  <tr><td>Programador</td>  <td>Dario Jose Zamora V - devdjzv</td></tr>
+  </table>
+  
+  <h3>Requerimiento 3. Documentacion ENDPOINT ESTADO PROGRAMACION</h3>
+  <table>
+  <tr><td>Número</td> <td>3</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>estado programaciones</td></tr>
+  <tr><td>URL</td>  <td>/estadoProgramacion/:id</td></tr>
+  <tr><td>Descripción</td>  <td>Permite cambiar el estado utilizado existente en la base de datos</td></tr>
+  <tr><td>Metodo HTTP</td>  <td>PUT</td></tr>
+  <tr><td>Header</td>  <td>Token:</td></tr>
+  <tr><td>Usuarios</td>  <td>Administrador</td></tr>
+  <tr><td>Request json</td>  <td>{null}</td></tr>
+  <tr><td>Respuesta json</td>  <td>   
+  Correcto: 
+  Status: 200
+  json:
+  {
+    "status": 200,
+    "message": "El estado se realizó correctamente y ahora es activo"
+  }
+  <br>
+  Incorrecto:
+  
+  Status: 404
+  json:{
+  "status": 404,
+  "message" : "El estado no se realizo correctamente"
+  }
+  <br>
+  Error: 
+  
+  Status: 500 
+  json: {
+  "status": 500,
+  "message" : "Error interno del servidor"
+  }
+  </td></tr>
+  <tr><td>Programador</td>  <td>Dario Jose Zamora V - devdjzv</td></tr>
+  </table>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <br>
+  
+  
+  
+  
+  <h3>Requerimiento 4. Documentacion ENDPOINT BUSCAR PROGRAMACIONES</h3>
+  <table>
+  <tr><td>Número</td> <td>4</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Buscar programaciones</td></tr>
+  <tr><td>URL</td>  <td>/buscarProgramacion/:id</td></tr>
+  <tr><td>Descripción</td>  <td>Permite buscar una Programacion utilizado por su id en la base de datos</td></tr>
+  <tr><td>Metodo HTTP</td>  <td>GET</td></tr>
+  <tr><td>Header</td>  <td>Token:</td></tr>
+  <tr><td>Usuarios</td>  <td>Administrador</td></tr>
+  <tr><td>Request json</td>  <td>{Null}</td></tr>
+  <tr><td>Respuesta json</td>  <td>   
+  Correcto: 
+  Status: 200
+  json:
+[
+  {
+"id_programacion": 7,
+"fecha_inicio": "2022-02-11T05:00:00.000Z",
+"fecha_fin": "2022-02-12T05:00:00.000Z",
+"usuario": "cesar ",
+"nombre_actividad": "raspar",
+"nombre_variedad": "cilantro",
+"lote": "pollos",
+"estado": "activo"
+  }
+
+]
+  <br>
+  Incorrecto:
+  
+  Status: 404
+  json:{
+  "status": 404,
+  "message" : "No se encontraron resultados para la búsqueda"
+  }
+  <br>
+  Error: 
+  
+  Status: 500 
+  json: {
+  "status": 500,
+  "message" : "Error interno del servidor"
+  }
+  </td></tr>
+  <tr><td>Programador</td>  <td>Dario Jose Zamora V - devdjzv</td></tr>
+  </table>
+  
+    
+  <br>
+  
+  
+  <h3>Requerimiento 5. Documentacion ENDPOINT LISTAR PROGRAMACIONES</h3>
+  <table>
+  <tr><td>Número</td> <td>5</td></tr>
+  <tr><td>Nombre del Servicio</td>  <td>Listar programaciones</td></tr>
+  <tr><td>URL</td>  <td>/listarProgramacion</td></tr>
+  <tr><td>Descripción</td>  <td>Permite obtener una lista de todas las programaciones registradas en la base de datos</td></tr>
+  <tr><td>Metodo HTTP</td>  <td>GET</td></tr>
+  <tr><td>Header</td>  <td>Token:</td></tr>
+  <tr><td>Usuarios</td>  <td>Administrador</td></tr>
+  <tr><td>Request json</td>  <td>Null</td></tr>
+  <tr><td>Respuesta json</td>  <td>   
+  Correcto: 
+  Status: 200
+  json:[  
+  {
+    "id_programacion": 5,
+    "fecha_inicio": "2022-02-11T05:00:00.000Z",
+    "fecha_fin": "2022-02-12T05:00:00.000Z",
+    "usuario": "danieel",
+    "nombre_actividad": "raspar",
+    "nombre_variedad": "cilantro",
+    "lote": "pollos",
+    "estado": "activo"
+  }
+  {
+    "id_programacion": 7,
+    "fecha_inicio": "2022-02-11T05:00:00.000Z",
+    "fecha_fin": "2022-02-12T05:00:00.000Z",
+    "usuario": "cesar ",
+    "nombre_actividad": "raspar",
+    "nombre_variedad": "cilantro",
+    "lote": "pollos",
+    "estado": "activo"
+},
+]
+  <br>
+  Incorrecto:
+  
+  Status: 404
+  json:{
+    "status": 404,
+    "message": "No hay ninguna programacion"
+  }
+  <br>
+  Error: 
+  
+  Status: 500 
+  json: {
+  "status": 500,
+  "message" : "Error interno del servidor"
+  }
+  </td></tr>
+  <tr><td>Programador</td>  <td>Dario Jose Zamora V - devdjzv</td></tr>
+  </table>
+</body>
+</html>
