@@ -3,114 +3,88 @@ import { validationResult } from "express-validator";
 
 export const registrarProgramacion = async (req, res) => {
 	try {
-		const errors = validationResult(req);
-		if (!errors.isEmpty()) {
-			return res.status(400).json(errors);
-		}
-
-		const {
-			fecha_inicio,
-			fecha_fin,
-			fk_identificacion,
-			fk_id_actividad,
-			fk_id_variedad, // Agregado fk_id_variedad
-			fk_id_lote,
-			estado,
-		} = req.body;
-
-		// Obtener el admin_id del usuario autenticado
-		const adminId = req.usuario;
-
-		// Verificar si el campo estado está presente en el cuerpo de la solicitud
-		if (!estado) {
-			return res.status(400).json({
-				status: 400,
-				message: "El campo 'estado' es obligatorio",
-			});
-		}
-
-		// Verificar si el usuario existe y pertenece al admin_id
-		const [usuarioExist] = await pool.query(
-			"SELECT * FROM usuarios WHERE identificacion = ? AND admin_id = ?",
-			[fk_identificacion, adminId]
-		);
-		if (usuarioExist.length === 0) {
-			return res.status(404).json({
-				status: 404,
-				message:
-					"El usuario no existe o no está autorizado para registrar programaciones.",
-			});
-		}
-
-		// Verificar si la actividad existe
-		const [actividadExist] = await pool.query(
-			"SELECT * FROM actividad WHERE id_actividad = ?",
-			[fk_id_actividad]
-		);
-		if (actividadExist.length === 0) {
-			return res.status(404).json({
-				status: 404,
-				message: "La actividad no existe. Registre primero una actividad.",
-			});
-		}
-
-		// Verificar si el lote existe
-		const [cultivoExist] = await pool.query(
-			"SELECT * FROM lotes WHERE id_lote = ?",
-			[fk_id_lote]
-		);
-		if (cultivoExist.length === 0) {
-			return res.status(404).json({
-				status: 404,
-				message: "El lote no existe. Registre primero un lote.",
-			});
-		}
-
-		// Verificar si la variedad existe
-		const [variedadExist] = await pool.query(
-			"SELECT * FROM variedad WHERE id_variedad = ?", // Verificar la tabla de variedades
-			[fk_id_variedad]
-		);
-		if (variedadExist.length === 0) {
-			return res.status(404).json({
-				status: 404,
-				message: "La variedad no existe. Registre primero una variedad.",
-			});
-		}
-
-		// Insertar la programación
-		const [result] = await pool.query(
-			"INSERT INTO programacion (fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_variedad, fk_id_lote ,admin_id) VALUES (?,?,?,?,?,?,?,?)",
-			[
-				fecha_inicio,
-				fecha_fin,
-				estado,
-				fk_identificacion,
-				fk_id_actividad,
-				fk_id_variedad,
-				fk_id_lote,
-				adminId,
-			]
-		);
-
-		if (result.affectedRows > 0) {
-			return res.status(200).json({
-				status: 200,
-				message: "Se registró con éxito",
-			});
-		} else {
-			return res.status(403).json({
-				status: 403,
-				message: "No se registró",
-			});
-		}
-	} catch (error) {
-		return res.status(500).json({
-			status: 500,
-			message: error.message || "Error en el sistema",
+	  const errors = validationResult(req);
+	  if (!errors.isEmpty()) {
+		return res.status(400).json(errors);
+	  }
+  
+	  const {
+		fecha_inicio,
+		fecha_fin,
+		fk_identificacion,
+		fk_id_actividad,
+		fk_id_lote,
+		estado
+	  } = req.body;
+  
+	  // Obtener el admin_id del usuario autenticado
+	  const adminId = req.usuario;
+  
+	  // Verificar si el campo estado está presente en el cuerpo de la solicitud
+	  if (!estado) {
+		return res.status(400).json({
+		  status: 400,
+		  message: "El campo 'estado' es obligatorio"
 		});
+	  }
+  
+	  // Verificar si el usuario existe y pertenece al admin_id
+	  const [usuarioExist] = await pool.query("SELECT * FROM usuarios WHERE identificacion = ? AND admin_id = ?", [fk_identificacion, adminId]);
+	  if (usuarioExist.length === 0) {
+		return res.status(404).json({
+		  status: 404,
+		  message: "El usuario no existe o no está autorizado para registrar programaciones."
+		});
+	  }
+  
+	  // Verificar si la actividad existe
+	  const [actividadExist] = await pool.query(
+		"SELECT * FROM actividad WHERE id_actividad = ?",
+		[fk_id_actividad]
+	  );
+	  if (actividadExist.length === 0) {
+		return res.status(404).json({
+		  status: 404,
+		  message: "La actividad no existe. Registre primero una actividad."
+		});
+	  }
+  
+	   // Verificar si el lote existe
+	  const [cultivoExist] = await pool.query(
+		"SELECT * FROM lotes WHERE id_lote = ?",
+		[fk_id_lote]
+	  );
+	  if (cultivoExist.length === 0) {
+		return res.status(404).json({
+		  status: 404,
+		  message: "El lote no existe. Registre primero un lote."
+		});
+	  }
+  
+	  // Insertar la programación
+	  const [result] = await pool.query(
+		"INSERT INTO programacion (fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, admin_id) VALUES (?,?,?,?,?,?,?)",
+		[fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, adminId]
+	  );
+  
+	  if (result.affectedRows > 0) {
+		return res.status(200).json({
+		  status: 200,
+		  message: "Se registró con éxito"
+		});
+	  } else {
+		return res.status(403).json({
+		  status: 403,
+		  message: "No se registró"
+		});
+	  }
+	} catch (error) {
+	  return res.status(500).json({
+		status: 500,
+		message: error.message || "Error en el sistema"
+	  });
 	}
-};
+  };
 
 // CRUD - Listar
 export const listarProgramacion = async (req, res) => {
@@ -175,7 +149,6 @@ export const actualizarProgramacion = async (req, res) => {
 			fecha_fin,
 			fk_identificacion,
 			fk_id_actividad,
-			fk_id_variedad, // Agregado fk_id_variedad
 			fk_id_lote,
 			estado,
 		} = req.body;
@@ -219,29 +192,16 @@ export const actualizarProgramacion = async (req, res) => {
 			});
 		}
 
-		// Verificar si la variedad existe
-		const [variedadExist] = await pool.query(
-			"SELECT * FROM variedad WHERE id_variedad = ?",
-			[fk_id_variedad]
-		);
-		if (variedadExist.length === 0) {
-			return res.status(404).json({
-				status: 404,
-				message: "La variedad no existe. Registre primero una variedad.",
-			});
-		}
-
 		// Actualizar la programación
 		const [result] = await pool.query(
 			`UPDATE programacion 
-            SET fecha_inicio = ?, fecha_fin = ?, fk_identificacion = ?, fk_id_actividad = ?, fk_id_variedad = ?, fk_id_lote = ?, estado = ? 
+            SET fecha_inicio = ?, fecha_fin = ?, fk_identificacion = ?, fk_id_actividad = ?,  fk_id_lote = ?, estado = ? 
             WHERE id_programacion = ? AND fk_identificacion = ?`,
 			[
 				fecha_inicio,
 				fecha_fin,
 				fk_identificacion,
 				fk_id_actividad,
-				fk_id_variedad, // Incluido en el set de actualización
 				fk_id_lote,
 				estado,
 				id,
