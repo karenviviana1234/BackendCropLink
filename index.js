@@ -9,7 +9,6 @@ import rutaDeTipoRecurso from './src/routes/TipoRecurso.route.js'
 import rutaUsuario from './src/routes/Usuarios.route.js'
 import { rutaDeEmpleado } from './src/routes/Empleado.route.js'
 import rutaFinca from './src/routes/Finca.routes.js'
-import Rutainversiones from './src/routes/Inversiones.route.js'
 import rutalote from './src/routes/lotes.routes.js'
 import rutaDeVariedad from './src/routes/variedad.routes.js'
 import rutaProgramacion from './src/routes/programacion.routes.js'
@@ -38,7 +37,6 @@ servidor.use(rutaProduccion)
 servidor.use(rutaDeEmpleado)
 servidor.use(router)
 servidor.use('/finca',rutaFinca)
-servidor.use(Rutainversiones)
 servidor.use(rutalote)
 servidor.use(rutaDeVariedad)
 servidor.use(rutaProgramacion)
