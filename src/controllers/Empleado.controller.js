@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 
 export const listarEmpleado = async (req, res) => {
   try {
-    // Obtener la identificación del usuario autenticados
+    // Obtener la identificación del usuario autenticado
     const identificacion = req.usuario;
 
     // Obtener todas las asignaciones relacionadas con el empleado
@@ -12,9 +12,12 @@ export const listarEmpleado = async (req, res) => {
         SELECT 
             u.identificacion,
             u.nombre,
+            p.id_programacion,
             p.fecha_inicio,
             p.fecha_fin,
+            l.nombre AS lote,
             v.nombre_variedad,
+            a.id_actividad, 
             a.nombre_actividad,
             a.tiempo,
             a.observaciones,
@@ -24,11 +27,9 @@ export const listarEmpleado = async (req, res) => {
         INNER JOIN 
             lotes l ON p.fk_id_lote = l.id_lote
         INNER JOIN 
-            cultivo c ON c.fk_id_lote = c.id_cultivo
-        INNER JOIN 
-            variedad v ON c.fk_id_variedad = v.id_variedad
-        INNER JOIN 
             actividad a ON p.fk_id_actividad = a.id_actividad
+        INNER JOIN 
+            variedad v ON a.fk_id_variedad = v.id_variedad 
         INNER JOIN 
             usuarios u ON p.fk_identificacion = u.identificacion
         WHERE 
@@ -37,6 +38,7 @@ export const listarEmpleado = async (req, res) => {
       [identificacion]
     );
 
+    // Verificar si se encontraron resultados
     if (result.length > 0) {
       res.status(200).json(result);
     } else {
