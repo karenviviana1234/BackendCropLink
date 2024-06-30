@@ -1,110 +1,115 @@
 import { pool } from "../database/conexion.js";
 import { validationResult } from "express-validator";
-//gokuuuuu
-//listar raa
+
+// Función para formatear el número
+function formatearNumero(numero) {
+  return numero.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
 // Controlador para listar actividades
 export const listarA = async (req, res) => {
   try {
-    const admin_id = req.usuario;
+      const admin_id = req.usuario;
 
-    const sql = `
-     SELECT 
-     ac.*,
-  ac.id_actividad, 
-  ac.nombre_actividad, 
-  ac.tiempo, 
-  ac.observaciones,
-  ac.valor_actividad,  
-  v.nombre_variedad,
-  GROUP_CONCAT(tr.nombre_recursos) AS nombre_recursos,
-  ac.observacion,
-  ac.estado
-FROM 
-  actividad AS ac 
-JOIN 
-  variedad AS v ON ac.fk_id_variedad = v.id_variedad
-JOIN 
-  actividad_tipo_recursos AS atr ON ac.id_actividad = atr.fk_id_actividad
-JOIN 
-  tipo_recursos AS tr ON atr.fk_id_tipo_recursos = tr.id_tipo_recursos
-WHERE 
-  ac.admin_id = ?   -- Agregar esta condición
-GROUP BY 
-  ac.id_actividad;
+      const sql = `
+          SELECT 
+          ac.*,
+          ac.id_actividad, 
+          ac.nombre_actividad, 
+          ac.tiempo, 
+          ac.observaciones,
+          ac.valor_actividad,  
+          v.nombre_variedad,
+          GROUP_CONCAT(tr.nombre_recursos) AS nombre_recursos,
+          ac.observacion,
+          ac.estado
+          FROM 
+          actividad AS ac 
+          JOIN 
+          variedad AS v ON ac.fk_id_variedad = v.id_variedad
+          JOIN 
+          actividad_tipo_recursos AS atr ON ac.id_actividad = atr.fk_id_actividad
+          JOIN 
+          tipo_recursos AS tr ON atr.fk_id_tipo_recursos = tr.id_tipo_recursos
+          WHERE 
+          ac.admin_id = ?   -- Agregar esta condición
+          GROUP BY 
+          ac.id_actividad;
+      `;
 
-    `;
+      const [result] = await pool.query(sql, [admin_id]);
 
-    const [result] = await pool.query(sql, [admin_id]);
+      if (result.length > 0) {
+          // Formatear el valor_actividad
+          result.forEach(actividad => {
+              actividad.valor_actividad = formatearNumero(actividad.valor_actividad);
+          });
 
-    if (result.length > 0) {
-      return res.status(200).json(result);
-    } else {
-      return res.status(404).json({
-        status: 404,
-        message: "No hay actividades que listar",
-      });
-    }
+          return res.status(200).json(result);
+      } else {
+          return res.status(404).json({
+              status: 404,
+              message: "No hay actividades que listar",
+          });
+      }
   } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      message: "Error en el sistema",
-    });
+      return res.status(500).json({
+          status: 500,
+          message: "Error en el sistema",
+      });
   }
 };
-
-
 
 // Controlador para registrar actividades
 export const RegistrarA = async (req, res) => {
   try {
-    const {
-      nombre_actividad,
-      tiempo,
-      observaciones,
-      valor_actividad,
-      fk_id_variedad,
-      fk_id_tipo_recursos,
-      estado
-    } = req.body;
+      const {
+          nombre_actividad,
+          tiempo,
+          observaciones,
+          valor_actividad,
+          fk_id_variedad,
+          fk_id_tipo_recursos,
+          estado
+      } = req.body;
 
-    // Validar los campos y realizar otras verificaciones necesarias...
+      // Validar los campos y realizar otras verificaciones necesarias...
 
-    // Insertar la actividad en la tabla Actividad
-    const [result] = await pool.query(
-      "INSERT INTO actividad (nombre_actividad, tiempo, observaciones, fk_id_variedad, valor_actividad, estado, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [
-        nombre_actividad,
-        tiempo,
-        observaciones,
-        fk_id_variedad,
-        valor_actividad,
-        estado,
-        req.usuario
-      ]
-    );
-
-    const actividadId = result.insertId;
-
-    // Insertar los tipos de recursos asociados a la actividad en la tabla de relación
-    for (const tipoRecursoId of fk_id_tipo_recursos) {
-      await pool.query(
-        "INSERT INTO actividad_tipo_recursos (fk_id_actividad, fk_id_tipo_recursos) VALUES (?, ?)",
-        [actividadId, tipoRecursoId]
+      // Insertar la actividad en la tabla Actividad
+      const [result] = await pool.query(
+          "INSERT INTO actividad (nombre_actividad, tiempo, observaciones, fk_id_variedad, valor_actividad, estado, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [
+              nombre_actividad,
+              tiempo,
+              observaciones,
+              fk_id_variedad,
+              valor_actividad,
+              estado,
+              req.usuario
+          ]
       );
-    }
 
-    return res.status(200).json({
-      status: 200,
-      message: "Se registró la actividad con éxito",
-    });
+      const actividadId = result.insertId;
+
+      // Insertar los tipos de recursos asociados a la actividad en la tabla de relación
+      for (const tipoRecursoId of fk_id_tipo_recursos) {
+          await pool.query(
+              "INSERT INTO actividad_tipo_recursos (fk_id_actividad, fk_id_tipo_recursos) VALUES (?, ?)",
+              [actividadId, tipoRecursoId]
+          );
+      }
+
+      return res.status(200).json({
+          status: 200,
+          message: "Se registró la actividad con éxito",
+      });
   } catch (error) {
-    return res.status(500).json({
-      status: 500,
-      message: error.message || "Error en el sistema",
-    });
+      return res.status(500).json({
+          status: 500,
+          message: error.message || "Error en el sistema",
+      });
   }
 };
-
 
 
 
@@ -199,6 +204,7 @@ export const RegistrarA = async (req, res) => {
 
 
 export const ActualizarA = async (req, res) => {
+  let connection;
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -220,7 +226,7 @@ export const ActualizarA = async (req, res) => {
     const admin_id = req.usuario;
 
     // Iniciar la transacción
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     await connection.beginTransaction();
 
     // Consultar los valores actuales de la actividad
@@ -228,12 +234,12 @@ export const ActualizarA = async (req, res) => {
 
     // Preparar los valores para la actualización
     const updateValues = {
-      nombre_actividad: nombre_actividad ? nombre_actividad : oldActivity[0].nombre_actividad,
-      tiempo: tiempo ? tiempo : oldActivity[0].tiempo,
-      observaciones: observaciones ? observaciones : oldActivity[0].observaciones,
-      fk_id_variedad: fk_id_variedad ? fk_id_variedad : oldActivity[0].fk_id_variedad,
-      valor_actividad: valor_actividad ? valor_actividad : oldActivity[0].valor_actividad,
-      estado: estado ? estado : oldActivity[0].estado,
+      nombre_actividad: nombre_actividad || oldActivity[0].nombre_actividad,
+      tiempo: tiempo || oldActivity[0].tiempo,
+      observaciones: observaciones || oldActivity[0].observaciones,
+      fk_id_variedad: fk_id_variedad || oldActivity[0].fk_id_variedad,
+      valor_actividad: valor_actividad || oldActivity[0].valor_actividad,
+      estado: estado || oldActivity[0].estado,
     };
 
     // Realizar la actualización en la base de datos
@@ -266,11 +272,13 @@ export const ActualizarA = async (req, res) => {
     );
 
     // Insertar los nuevos tipos de recursos asociados a la actividad en la tabla de relación
-    for (const tipoRecursoId of fk_id_tipo_recursos) {
-      await connection.query(
-        "INSERT INTO actividad_tipo_recursos (fk_id_actividad, fk_id_tipo_recursos) VALUES (?, ?)",
-        [id, tipoRecursoId]
-      );
+    if (fk_id_tipo_recursos && fk_id_tipo_recursos.length > 0) {
+      for (const tipoRecursoId of fk_id_tipo_recursos) {
+        await connection.query(
+          "INSERT INTO actividad_tipo_recursos (fk_id_actividad, fk_id_tipo_recursos) VALUES (?, ?)",
+          [id, tipoRecursoId]
+        );
+      }
     }
 
     // Realizar commit de la transacción
@@ -285,10 +293,10 @@ export const ActualizarA = async (req, res) => {
     });
   } catch (error) {
     // Si hay un error, realizar rollback de la transacción
-    await connection.rollback();
+    if (connection) await connection.rollback();
 
     // Liberar la conexión
-    connection.release();
+    if (connection) connection.release();
 
     return res.status(500).json({
       status: 500,
@@ -297,8 +305,23 @@ export const ActualizarA = async (req, res) => {
   }
 };
 
+export const obtenerTiposRecursos = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [result] = await pool.query(
+      `SELECT fk_id_tipo_recursos FROM actividad_tipo_recursos WHERE fk_id_actividad = ?`,
+      [id]
+    );
 
-
+    const tipoRecursos = result.map(row => row.fk_id_tipo_recursos);
+    return res.status(200).json(tipoRecursos);
+  } catch (error) {
+    return res.status(500).json({
+      status: 500,
+      message: error.message || "Error en el sistema",
+    });
+  }
+};
 
 
 

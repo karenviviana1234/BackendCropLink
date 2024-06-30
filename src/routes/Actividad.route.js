@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { listarA,RegistrarA,ActualizarA,DesactivarA,BuscarA, } from "../controllers/Actividad.controller.js";
+import { listarA,RegistrarA,ActualizarA,DesactivarA,BuscarA,obtenerTiposRecursos } from "../controllers/Actividad.controller.js";
 import { validarRA, validarRR } from "../../validate/Actividadvalidate.js";
 
 import {validarToken} from "../controllers/autenticacion.js";
@@ -13,7 +13,9 @@ rutaDeActividad.post("/Registrara",validarToken,  validarRR,  RegistrarA);
 rutaDeActividad.put("/Actualizara/actividad/:id",validarToken, validarRA, ActualizarA);
 rutaDeActividad.put("/Desactivara/actividad/:id", validarToken , DesactivarA);
 rutaDeActividad.get("/Buscar/actividad/:id",validarToken, BuscarA);
-/* rutaDeActividad.put("/EmpleadoMood/actividad/:id", validarToken , Empleado); */
+// Ruta para obtener los tipos de recursos asociados a una actividad
+rutaDeActividad.get('/actividad/:id/tipo_recursos', obtenerTiposRecursos);
+
 
 
 export { rutaDeActividad };

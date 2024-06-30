@@ -69,6 +69,7 @@ export const RegistroFinca = async (req, res) => {
         });
     }
 }
+
 export const ActualizarFinca = async (req, res) => {
     try {
         const errors = validationResult(req);
