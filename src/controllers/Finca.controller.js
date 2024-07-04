@@ -203,3 +203,29 @@ export const desactivarF = async (req, res) => {
     }
 };
 
+export const listarSumaFincas = async (req, res) => {
+    try {
+        const adminId = req.usuario;
+
+        if (!adminId) {
+            return res.status(403).json({ message: 'No se proporcionó la identificación del administrador en el token' });
+        }
+
+        const [result] = await pool.query("SELECT COUNT(*) as totalFincas FROM finca WHERE admin_id = ?", [adminId]);
+
+        if (result.length > 0) {
+            return res.status(200).json({ totalFincas: result[0].totalFincas });
+        } else {
+            return res.status(404).json({
+                status: 404,
+                message: 'No se encontraron fincas registradas por este administrador'
+            });
+        }
+    } catch (error) {
+        console.error("Error al listar la suma de fincas del administrador:", error);
+        return res.status(500).json({
+            status: 500,
+            message: 'Error en el sistema al listar la suma de fincas del administrador'
+        });
+    }
+};

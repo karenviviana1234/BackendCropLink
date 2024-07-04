@@ -278,4 +278,81 @@ export const perfil = async (req, res) => {
       });
     }
   };
+
+
+  export const actualizarPerfil = async (req, res) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
   
+      const { identificacion } = req.params;
+      const { nombre, apellido, correo } = req.body;
+  
+      const [oldUsuario] = await pool.query('SELECT * FROM usuarios WHERE identificacion = ?', [identificacion]);
+  
+      if (oldUsuario.length === 0) {
+        return res.status(404).json({
+          status: 404,
+          message: 'Usuario no encontrado',
+        });
+      }
+  
+      const updatedUsuario = {
+        nombre: nombre || oldUsuario[0].nombre,
+        apellido: apellido || oldUsuario[0].apellido,
+        correo: correo || oldUsuario[0].correo,
+      };
+  
+      const [result] = await pool.query(
+        `UPDATE usuarios SET nombre=?, apellido=?, correo=? WHERE identificacion = ?`,
+        [updatedUsuario.nombre, updatedUsuario.apellido, updatedUsuario.correo, identificacion]
+      );
+  
+      if (result.affectedRows > 0) {
+        res.status(200).json({
+          status: 200,
+          message: 'El perfil del usuario ha sido actualizado.',
+        });
+      } else {
+        res.status(500).json({
+          status: 500,
+          message: 'No se pudo actualizar el perfil del usuario, inténtalo de nuevo.',
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: 'Error en el sistema: ' + error.message,
+      });
+    }
+  };
+  export const obtenerTotalEmpleados = async (req, res) => {
+    try {
+      // Obtener la identificación del administrador desde el token
+      const adminId = req.usuario; 
+  
+      // Realizar la consulta para contar los usuarios con rol de 'empleado' registrados por el administrador
+      const [result] = await pool.query(
+        'SELECT COUNT(*) as totalEmpleados FROM usuarios WHERE admin_id = ? AND rol = "empleado"',
+        [adminId]
+      );
+  
+      if (result.length > 0) {
+        res.status(200).json({
+          totalEmpleados: result[0].totalEmpleados
+        });
+      } else {
+        res.status(404).json({
+          status: 404,
+          message: 'No se encontraron empleados registrados por este administrador'
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: 'Error en el sistema: ' + error.message
+      });
+    }
+  };
