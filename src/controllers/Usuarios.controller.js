@@ -238,14 +238,11 @@ export const desactivarUsuario = async (req, res) => {
     }
 };
 
-//listar perfil
 
 export const perfil = async (req, res) => {
     try {
-      // Obtener la identificación del usuario autenticado desde el token
       const identificacion = req.usuario;
   
-      // Consulta para obtener la información específica del usuario
       const [result] = await pool.query(`
         SELECT  
             u.nombre,
@@ -259,11 +256,10 @@ export const perfil = async (req, res) => {
             u.identificacion = ?;
       `, [identificacion]);
   
-      // Verificar si se encontró el usuario
       if (result.length > 0) {
         res.status(200).json({
           status: 200,
-          data: result[0]  // Enviar la información del usuario
+          data: result[0]  
         });
       } else {
         res.status(404).json({
@@ -330,10 +326,8 @@ export const perfil = async (req, res) => {
   };
   export const obtenerTotalEmpleados = async (req, res) => {
     try {
-      // Obtener la identificación del administrador desde el token
       const adminId = req.usuario; 
   
-      // Realizar la consulta para contar los usuarios con rol de 'empleado' registrados por el administrador
       const [result] = await pool.query(
         'SELECT COUNT(*) as totalEmpleados FROM usuarios WHERE admin_id = ? AND rol = "empleado"',
         [adminId]

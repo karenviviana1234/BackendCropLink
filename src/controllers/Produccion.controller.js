@@ -1,47 +1,86 @@
 import { pool } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 
-export const listarProduccion = async (req, res) => {
+export const listarProduccion = async (req,res) => {
+
     try {
-        // Obtener el admin_id del usuario autenticado
-        const adminId = req.usuario;
+        const identificacion = req.usuario;
 
-        let sql = `
-            SELECT 
-                produ.id_producccion,
-                produ.cantidad_produccion, 
-                produ.precio, 
-                produ.fk_id_programacion AS id_programacion,  
-                pro.fecha_inicio, 
-                pro.fecha_fin,
-                produ.valor_inversion,
-                produ.estado
-            FROM 
-                produccion AS produ
-            JOIN 
-                programacion AS pro ON produ.fk_id_programacion = pro.id_programacion
-            WHERE
-                pro.admin_id = ?;
-        `;
+        const [fincas] = await pool.query(`
+            SELECT f.id_finca, f.nombre_finca
+            FROM finca f
+            WHERE f.admin_id = ?
+        `, [identificacion]);
 
-        const [listar] = await pool.query(sql, [adminId]);
-
-        if (listar.length > 0) {
-            res.status(200).json(listar);
-        } else {
-            res.status(400).json({
-                status: 400,
-                message: 'No hay ninguna producción asociada al administrador actual'
-            });
+        if (fincas.length === 0) {
+            return res.status(404).json({ message: 'El usuario no tiene fincas registradas.' });
         }
+
+        let producciones = [];
+
+        for (const finca of fincas) {
+            const [result] = await pool.query(`
+                SELECT p.id_producccion, p.cantidad_produccion, p.precio, p.valor_inversion, p.fk_id_programacion, p.fk_id_cultivo, p.estado, p.admin_id
+                FROM produccion p
+                JOIN programacion pr ON p.fk_id_programacion = pr.id_programacion
+                JOIN lotes l ON pr.fk_id_lote = l.id_lote
+                WHERE l.fk_id_finca = ? AND p.admin_id = ?
+            `, [finca.id_finca, identificacion]);
+
+            producciones = producciones.concat(result);
+        }
+
+        res.json(producciones);
+
     } catch (error) {
         console.error(error);
-        res.status(500).json({
-            status: 500,
-            message: 'Error en el servidor',
-        });
+        res.status(500).json({ message: 'Error al obtener las producciones del usuario.' });
     }
 };
+
+
+export const sumarProducciones = async (req, res) => {
+    try {
+      const identificacion = req.usuario;
+      const [fincas] = await pool.query('SELECT id_finca, nombre_finca FROM finca WHERE estado = "activo"');
+
+
+      const resultados = await Promise.all(fincas.map(async (finca) => {
+        const [lotes] = await pool.query('SELECT id_lote FROM lotes WHERE fk_id_finca = ? AND estado = "activo"', [finca.id_finca]);
+  
+        let totalPrecio = 0;
+        let totalValorInversion = 0;
+  
+        for (const lote of lotes) {
+          const [programaciones] = await pool.query('SELECT id_programacion FROM programacion WHERE fk_id_lote = ? AND estado = "activo"', [lote.id_lote]);
+  
+          for (const programacion of programaciones) {
+            const [producciones] = await pool.query('SELECT precio, valor_inversion FROM produccion WHERE fk_id_programacion = ? AND estado = "activo"', [programacion.id_programacion]);
+  
+            producciones.forEach(produccion => {
+              totalPrecio += produccion.precio;
+              totalValorInversion += produccion.valor_inversion;
+            });
+          }
+        }
+
+        const [usuario] = await pool.query('SELECT nombre, apellido FROM usuarios WHERE identificacion = ?', [identificacion]);
+  
+        return {
+          finca: finca.nombre_finca,
+          usuario: `${usuario[0].nombre} ${usuario[0].apellido}`,
+          totalPrecio,
+          totalValorInversion
+        };
+      }));
+  
+      res.json(resultados);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error al sumar las producciones' });
+    }
+  };
+  
 
 export const registrarProduccion = async (req, res) => {
     try {
