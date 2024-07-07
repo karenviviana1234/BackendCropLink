@@ -49,6 +49,7 @@ export const registrarVariedad = async (req, res) => {
     }
 };
 
+
 // CRUD - Listar
 export const listarVariedades = async (req, res) => {
     try {
