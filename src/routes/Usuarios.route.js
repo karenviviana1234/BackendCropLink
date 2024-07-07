@@ -10,7 +10,7 @@ rutaUsuario.get('/listarUsuarios', validarToken,listarUsuarios);
 rutaUsuario.get('/listarPerfil', validarToken,perfil);  
 rutaUsuario.post('/registrarUsuario' ,registrarUsuarios);
 rutaUsuario.put('/desactivarUsuario/:identificacion',validarToken, desactivarUsuario);
-rutaUsuario.put('/actualizarUsuario/:idAentificacion',validarToken,actualizarUsuario);
+rutaUsuario.put('/actualizarUsuario/:identificacion',validarToken,actualizarUsuario);
 rutaUsuario.get('/buscarUsuarios/:identificacion',validarToken, buscarUsuario);
 rutaUsuario.put('/actualizarPerfil/:identificacion',validarToken, actualizarPerfil);
 rutaUsuario.get('/sumaEmpleados',validarToken, obtenerTotalEmpleados);
