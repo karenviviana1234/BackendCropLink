@@ -5,7 +5,7 @@ export const listarProduccion = async (req, res) => {
     try {
         // Obtener el admin_id del usuario autenticado
         const adminId = req.usuario;
-
+//Consulta sql
         let sql = `
             SELECT 
                 produ.id_producccion,
@@ -23,8 +23,9 @@ export const listarProduccion = async (req, res) => {
             WHERE
                 pro.admin_id = ?;
         `;
-
+//lista por el id del administracion
         const [listar] = await pool.query(sql, [adminId]);
+    //condicionales para ver si se cumplio el proceso, el else es por si no se cumplio o ocurrio un problema 
 
         if (listar.length > 0) {
             res.status(200).json(listar);
@@ -50,7 +51,7 @@ export const registrarProduccion = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-
+//datos que se pide para registrar la produccion
         const { cantidad_produccion, precio, fk_id_programacion } = req.body;
 
         // Obtener el adminId del usuario autenticado
@@ -61,7 +62,7 @@ export const registrarProduccion = async (req, res) => {
             'SELECT * FROM programacion WHERE id_programacion = ? AND admin_id = ?',
             [fk_id_programacion, adminId]
         );
-
+//condicional para verificar si hay una programacion registrada
         if (programacionExist.length === 0) {
             return res.status(404).json({
                 status: 404,
@@ -88,6 +89,7 @@ export const registrarProduccion = async (req, res) => {
             'INSERT INTO produccion (cantidad_produccion, precio, fk_id_programacion, valor_inversion, estado, admin_id) VALUES (?, ?, ?, ?, ?, ?)',
             [cantidad_produccion, precio, fk_id_programacion, valor_inversion, estado, adminId]
         );
+    //condicionales para ver si se cumplio el proceso, el else es por si no se cumplio o ocurrio un problema 
 
         if (Registrar.affectedRows > 0) {
             return res.status(200).json({
@@ -118,7 +120,7 @@ export const actualizarProduccion = async (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-
+//datos que se pueden actualizar
         const { cantidad_produccion, precio, fk_id_programacion } = req.body;
         const { id_producccion } = req.params; // Obtener id_producccion de los parámetros de la URL
 
@@ -130,7 +132,7 @@ export const actualizarProduccion = async (req, res) => {
             'SELECT * FROM produccion WHERE id_producccion = ? AND admin_id = ?',
             [id_producccion, adminId]
         );
-
+//conidcional para ver la produccion del admin
         if (produccionExist.length === 0) {
             return res.status(404).json({
                 status: 404,
@@ -143,7 +145,7 @@ export const actualizarProduccion = async (req, res) => {
             'SELECT * FROM programacion WHERE id_programacion = ? AND admin_id = ?',
             [fk_id_programacion, adminId]
         );
-
+//condicional para verificar la programacion
         if (programacionExist.length === 0) {
             return res.status(404).json({
                 status: 404,
@@ -167,7 +169,7 @@ export const actualizarProduccion = async (req, res) => {
             'UPDATE produccion SET cantidad_produccion = ?, precio = ?, fk_id_programacion = ?, valor_inversion = ? WHERE id_producccion = ? AND admin_id = ?',
             [cantidad_produccion, precio, fk_id_programacion, valor_inversion, id_producccion, adminId]
         );
-
+    //condicionales para ver si se cumplio el proceso, el else es por si no se cumplio o ocurrio un problema 
         if (actualizar.affectedRows > 0) {
             return res.status(200).json({
                 status: 200,
@@ -210,9 +212,9 @@ export const desactivarProduccion = async (req, res) => {
         }
 
         const currentState = currentResult[0].estado;
-
+//cambiar el estado
         const nuevoEstado = currentState === 'activo' ? 'inactivo' : 'activo';
-
+//se actualiza por la produccion
         await pool.query(
             "UPDATE produccion SET estado = ? WHERE id_producccion = ?",
             [nuevoEstado, id_producccion]
