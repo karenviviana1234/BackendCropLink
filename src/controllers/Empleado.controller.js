@@ -55,46 +55,15 @@ export const listarEmpleado = async (req, res) => {
 };
 
 
-
-
-/* // Controlador para mostrar actividades asignadas a un empleado
-export const listarE = async (req, res) => {
-    try {
-        // Aquí deberías obtener el ID del empleado que ha iniciado sesión (puedes acceder a esto desde req.user o alguna otra fuente de autenticación)
-        const empleadoId = req.user.id; // Esto es un ejemplo, puedes obtener el ID del empleado según cómo manejes la autenticación
-
-        // Consulta para obtener las actividades asignadas al empleado
-        const actividadesAsignadas = await Actividad.findAll({
-            where: {
-                // Condición para seleccionar las actividades asignadas al empleado específico
-                // Aquí deberías tener una relación en tu base de datos entre las actividades y los empleados para poder filtrarlas correctamente
-                fk_id_empleado: empleadoId // Esto es un ejemplo, ajusta según tu modelo de datos
-            },
-            include: [{ model: Variedad, as: 'variedad' }] // Incluye la variedad asociada a cada actividad
-        });
-
-        // Si se encontraron actividades asignadas, las devolvemos como respuesta
-        if (actividadesAsignadas) {
-            return res.status(200).json({ actividades: actividadesAsignadas });
-        } else {
-            return res.status(404).json({ message: 'No se encontraron actividades asignadas.' });
-        }
-    } catch (error) {
-        console.error('Error al obtener actividades asignadas:', error);
-        return res.status(500).json({ message: 'Error interno del servidor.' });
-    }
-};
- */
-// este sirve, solo que lo comente por si las moscas
-
 export const RegistrarE = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors);
       return res.status(400).json(errors);
     }
 
-    const { id } = req.params;
+    const { id_actividad } = req.params;
     const { observacion } = req.body;
 
     // Verificar si se proporcionó una observación
@@ -105,12 +74,15 @@ export const RegistrarE = async (req, res) => {
       });
     }
 
+    console.log('Actualizando observación:', observacion, 'para id:', id_actividad);
+
     // Actualizar la observación en la tabla de actividad
-    const nuevoEstado = observacion; // o el nombre del campo correspondiente en req.body
     const [resultActividad] = await pool.query(
       `UPDATE actividad SET observacion = ? WHERE id_actividad = ?`,
-      [nuevoEstado, id]
+      [observacion, id_actividad]
     );
+
+    console.log('Resultado de la actualización:', resultActividad);
 
     if (resultActividad.affectedRows > 0) {
       return res.status(200).json({
@@ -120,16 +92,19 @@ export const RegistrarE = async (req, res) => {
     } else {
       return res.status(403).json({
         status: 403,
-        message: "No se pudo actualizar la observación en la actividad",
+        message: "No se pudo actualizar la observación en la Actividad",
       });
     }
   } catch (error) {
+    console.error('Error al actualizar la observación:', error);
     return res.status(500).json({
       status: 500,
       message: error.message || "Error en el sistema",
     });
   }
 };
+
+
 
 //
 
