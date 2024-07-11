@@ -155,6 +155,7 @@ export const buscarVariedad = async (req, res) => {
     }
 
 };
+
 export const desactivarVariedad = async (req, res) => {
     try {
         const { id_variedad } = req.params;
