@@ -1,90 +1,136 @@
 import { pool } from "../database/conexion.js";
 import { validationResult } from "express-validator";
+import { sendNotificationToEmployee } from '../notifications/emailNotifications.js'; // Asegúrate de tener esta función definida en emailNotifications.js
+import cron from 'node-cron';
 
 export const registrarProgramacion = async (req, res) => {
-	try {
-	  const errors = validationResult(req);
-	  if (!errors.isEmpty()) {
-		return res.status(400).json(errors);
-	  }
-  
-	  const {
-		fecha_inicio,
-		fecha_fin,
-		fk_identificacion,
-		fk_id_actividad,
-		fk_id_lote,
-		estado
-	  } = req.body;
-  
-	  // Obtener el admin_id del usuario autenticado
-	  const adminId = req.usuario;
-  
-	  // Verificar si el campo estado está presente en el cuerpo de la solicitud
-	  if (!estado) {
-		return res.status(400).json({
-		  status: 400,
-		  message: "El campo 'estado' es obligatorio"
-		});
-	  }
-  
-	  // Verificar si el usuario existe y pertenece al admin_id
-	  const [usuarioExist] = await pool.query("SELECT * FROM usuarios WHERE identificacion = ? AND admin_id = ?", [fk_identificacion, adminId]);
-	  if (usuarioExist.length === 0) {
-		return res.status(404).json({
-		  status: 404,
-		  message: "El usuario no existe o no está autorizado para registrar programaciones."
-		});
-	  }
-  
-	  // Verificar si la actividad existe
-	  const [actividadExist] = await pool.query(
-		"SELECT * FROM actividad WHERE id_actividad = ?",
-		[fk_id_actividad]
-	  );
-	  if (actividadExist.length === 0) {
-		return res.status(404).json({
-		  status: 404,
-		  message: "La actividad no existe. Registre primero una actividad."
-		});
-	  }
-  
-	   // Verificar si el lote existe
-	  const [cultivoExist] = await pool.query(
-		"SELECT * FROM lotes WHERE id_lote = ?",
-		[fk_id_lote]
-	  );
-	  if (cultivoExist.length === 0) {
-		return res.status(404).json({
-		  status: 404,
-		  message: "El lote no existe. Registre primero un lote."
-		});
-	  }
-  
-	  // Insertar la programación
-	  const [result] = await pool.query(
-		"INSERT INTO programacion (fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, admin_id) VALUES (?,?,?,?,?,?,?)",
-		[fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, adminId]
-	  );
-  
-	  if (result.affectedRows > 0) {
-		return res.status(200).json({
-		  status: 200,
-		  message: "Se registró con éxito"
-		});
-	  } else {
-		return res.status(403).json({
-		  status: 403,
-		  message: "No se registró"
-		});
-	  }
-	} catch (error) {
-	  return res.status(500).json({
-		status: 500,
-		message: error.message || "Error en el sistema"
-	  });
-	}
-  };
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json(errors);
+        }
+
+        const {
+            fecha_inicio,
+            fecha_fin,
+            fk_identificacion,
+            fk_id_actividad,
+            fk_id_lote,
+            estado
+        } = req.body;
+
+        const adminId = req.usuario;
+
+        if (!estado) {
+            return res.status(400).json({
+                status: 400,
+                message: "El campo 'estado' es obligatorio"
+            });
+        }
+
+        const [usuarioExist] = await pool.query("SELECT * FROM usuarios WHERE identificacion = ? AND admin_id = ?", [fk_identificacion, adminId]);
+        if (usuarioExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "El usuario no existe o no está autorizado para registrar programaciones."
+            });
+        }
+
+        const [actividadExist] = await pool.query(
+            "SELECT * FROM actividad WHERE id_actividad = ?",
+            [fk_id_actividad]
+        );
+        if (actividadExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "La actividad no existe. Registre primero una actividad."
+            });
+        }
+
+        const [cultivoExist] = await pool.query(
+            "SELECT * FROM lotes WHERE id_lote = ?",
+            [fk_id_lote]
+        );
+        if (cultivoExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "El lote no existe. Registre primero un lote."
+            });
+        }
+
+        const [result] = await pool.query(
+            "INSERT INTO programacion (fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, admin_id) VALUES (?,?,?,?,?,?,?)",
+            [fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, adminId]
+        );
+
+        if (result.affectedRows > 0) {
+            const [usuario] = usuarioExist;
+            sendNotificationToEmployee(usuario.correo, `Se ha programado una nueva actividad que empieza el ${fecha_inicio} y termina el ${fecha_fin}.`);
+
+            return res.status(200).json({
+                status: 200,
+                message: "Se registró con éxito y notificación enviada al empleado."
+            });
+        } else {
+            return res.status(403).json({
+                status: 403,
+                message: "No se registró"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message || "Error en el sistema"
+        });
+    }
+};
+
+// Cron job para enviar recordatorios a las 8:15 PM cada noche
+cron.schedule('15 20 * * *', async () => {
+    try {
+        // Obtener la fecha de mañana
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const formattedDate = tomorrow.toISOString().split('T')[0];
+
+        // Obtener la hora actual para el log
+        const currentTime = new Date().toISOString();
+
+        // Imprimir en consola la hora y fecha del recordatorio
+        console.log(`Recordatorio generado en: ${currentTime}`);
+        console.log(`Se enviarán recordatorios para actividades que terminan el ${formattedDate}`);
+
+        // Seleccionar actividades que terminan mañana
+        const [activities] = await pool.query(
+            "SELECT fk_identificacion, fk_id_actividad, fecha_fin FROM programacion WHERE fecha_fin = ?",
+            [formattedDate]
+        );
+
+        // Imprimir cuántas actividades se encontraron
+        console.log(`Se encontraron ${activities.length} actividades que terminan el ${formattedDate}`);
+
+        // Iterar sobre cada actividad encontrada
+        for (const activity of activities) {
+            // Obtener el correo del usuario asociado a la actividad
+            const [usuarios] = await pool.query("SELECT correo FROM usuarios WHERE identificacion = ?", [activity.fk_identificacion]);
+            if (usuarios.length > 0) {
+                // Crear el mensaje del recordatorio
+                const message = `Recordatorio: la actividad ${activity.fk_id_actividad} termina mañana.`;
+
+                // Imprimir en consola el mensaje que se enviará
+                console.log(`Enviando recordatorio a ${usuarios[0].correo}: ${message}`);
+
+                // Enviar recordatorio por correo electrónico
+                sendNotificationToEmployee(usuarios[0].correo, message);
+
+                // Imprimir en consola la fecha y hora del recordatorio
+                console.log(`Correo de recordatorio enviado a ${usuarios[0].correo} a las ${new Date().toISOString()}`);
+            }
+        }
+    } catch (error) {
+        console.error('Error al enviar recordatorios:', error);
+    }
+});
 
 // CRUD - Listar
 export const listarProgramacion = async (req, res) => {

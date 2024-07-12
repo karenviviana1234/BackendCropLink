@@ -14,6 +14,7 @@ import rutaDeVariedad from './src/routes/variedad.routes.js'
 import rutaProgramacion from './src/routes/programacion.routes.js'
 import rutaCultivos from './src/routes/Cultivos.routes.js'
 import rutaCostos from './src/routes/Costos.routes.js'
+import { rutaDeRecu } from './src/routes/recuperacio.route.js'
 
 
 //servidor
@@ -42,7 +43,7 @@ servidor.use(rutaDeVariedad)
 servidor.use(rutaProgramacion)
 servidor.use(rutaCultivos)
 servidor.use(rutaCostos)
-
+servidor.use(rutaDeRecu)
 
 //carpetas documentacion
 servidor.set('view engine', 'ejs');
