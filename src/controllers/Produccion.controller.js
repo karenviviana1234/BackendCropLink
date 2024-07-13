@@ -71,6 +71,10 @@ export const sumarProducciones = async (req, res) => {
     try {
         const identificacion = req.usuario; // Supongo que req.usuario contiene la identificación del usuario autenticado
 
+        if (!identificacion) {
+            return res.status(400).json({ message: 'Usuario no autenticado' });
+        }
+
         const query = `
             SELECT 
                 f.id_finca,
@@ -90,7 +94,7 @@ export const sumarProducciones = async (req, res) => {
             JOIN 
                 usuarios u ON f.admin_id = u.identificacion
             WHERE 
-                pr.estado = 'activo' AND f.admin_id = ?
+                pr.estado = 'activo' AND f.admin_id = ? AND f.estado = 'activo'
             GROUP BY 
                 f.id_finca, año, u.nombre
             ORDER BY 
@@ -104,7 +108,9 @@ export const sumarProducciones = async (req, res) => {
         console.error('Error al sumar las producciones por finca y año:', error);
         res.status(500).json({ message: 'Error al sumar las producciones' });
     }
-}
+};
+
+
 
 export const registrarProduccion = async (req, res) => {
     try {
