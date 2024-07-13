@@ -1,7 +1,14 @@
 import { Router } from "express";
-import { tokenPassword } from "../controllers/validacionUsuario.js"
+import {
+    resetPassword,
+    tokenPassword,
 
-const rutaPassword = Router();
+} from "../controllers/validacionUsuario.js";
 
-rutaPassword.post('/passwordtoken', tokenPassword)
-rutaPassword.post('/passwordtoken', )
+const routepassword = Router();
+
+
+routepassword.post("/recuperar", tokenPassword);
+routepassword.put("/cambiar", resetPassword);
+
+export default routepassword;
