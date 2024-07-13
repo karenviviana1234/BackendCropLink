@@ -3,88 +3,6 @@ import { validationResult } from "express-validator";
 import { sendNotificationToEmployee } from '../notifications/emailNotifications.js'; // Asegúrate de tener esta función definida en emailNotifications.js
 import cron from 'node-cron';
 
-export const registrarProgramacion = async (req, res) => {
-    try {
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json(errors);
-        }
-
-        const {
-            fecha_inicio,
-            fecha_fin,
-            fk_identificacion,
-            fk_id_actividad,
-            fk_id_lote,
-            estado
-        } = req.body;
-
-        const adminId = req.usuario;
-
-        if (!estado) {
-            return res.status(400).json({
-                status: 400,
-                message: "El campo 'estado' es obligatorio"
-            });
-        }
-
-        const [usuarioExist] = await pool.query("SELECT * FROM usuarios WHERE identificacion = ? AND admin_id = ?", [fk_identificacion, adminId]);
-        if (usuarioExist.length === 0) {
-            return res.status(404).json({
-                status: 404,
-                message: "El usuario no existe o no está autorizado para registrar programaciones."
-            });
-        }
-
-        const [actividadExist] = await pool.query(
-            "SELECT * FROM actividad WHERE id_actividad = ?",
-            [fk_id_actividad]
-        );
-        if (actividadExist.length === 0) {
-            return res.status(404).json({
-                status: 404,
-                message: "La actividad no existe. Registre primero una actividad."
-            });
-        }
-
-        const [cultivoExist] = await pool.query(
-            "SELECT * FROM lotes WHERE id_lote = ?",
-            [fk_id_lote]
-        );
-        if (cultivoExist.length === 0) {
-            return res.status(404).json({
-                status: 404,
-                message: "El lote no existe. Registre primero un lote."
-            });
-        }
-
-        const [result] = await pool.query(
-            "INSERT INTO programacion (fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, admin_id) VALUES (?,?,?,?,?,?,?)",
-            [fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, adminId]
-        );
-
-        if (result.affectedRows > 0) {
-            const [usuario] = usuarioExist;
-            sendNotificationToEmployee(usuario.correo, `Se ha programado una nueva actividad que empieza el ${fecha_inicio} y termina el ${fecha_fin}.`);
-
-            return res.status(200).json({
-                status: 200,
-                message: "Se registró con éxito y notificación enviada al empleado."
-            });
-        } else {
-            return res.status(403).json({
-                status: 403,
-                message: "No se registró"
-            });
-        }
-    } catch (error) {
-        return res.status(500).json({
-            status: 500,
-            message: error.message || "Error en el sistema"
-        });
-    }
-};
-
 // Cron job para enviar recordatorios a las 8:15 PM cada noche
 cron.schedule('15 20 * * *', async () => {
     try {
@@ -132,6 +50,228 @@ cron.schedule('15 20 * * *', async () => {
     }
 });
 
+export const registrarProgramacion = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json(errors);
+        }
+
+        const {
+            fecha_inicio,
+            fecha_fin,
+            fk_identificacion,
+            fk_id_actividad,
+            fk_id_lote,
+            estado
+        } = req.body;
+
+        const adminId = req.usuario;
+
+        if (!estado) {
+            return res.status(400).json({
+                status: 400,
+                message: "El campo 'estado' es obligatorio"
+            });
+        }
+
+        const [usuarioExist] = await pool.query(
+            "SELECT * FROM usuarios WHERE identificacion = ? AND admin_id = ?", 
+            [fk_identificacion, adminId]
+        );
+        if (usuarioExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "El usuario no existe o no está autorizado para registrar programaciones."
+            });
+        }
+
+        const [actividadExist] = await pool.query(
+            "SELECT * FROM actividad WHERE id_actividad = ?",
+            [fk_id_actividad]
+        );
+        if (actividadExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "La actividad no existe. Registre primero una actividad."
+            });
+        }
+
+        const [cultivoExist] = await pool.query(
+            "SELECT * FROM lotes WHERE id_lote = ?",
+            [fk_id_lote]
+        );
+        if (cultivoExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "El lote no existe. Registre primero un lote."
+            });
+        }
+
+        // Verificar si la actividad ya está programada
+        const [existingProgram] = await pool.query(
+            "SELECT * FROM programacion WHERE fk_id_actividad = ?",
+            [fk_id_actividad]
+        );
+        if (existingProgram.length > 0) {
+            return res.status(400).json({
+                status: 400,
+                message: "La actividad ya está programada. No se puede programar nuevamente."
+            });
+        }
+
+        const [result] = await pool.query(
+            "INSERT INTO programacion (fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, admin_id) VALUES (?,?,?,?,?,?,?)",
+            [fecha_inicio, fecha_fin, estado, fk_identificacion, fk_id_actividad, fk_id_lote, adminId]
+        );
+
+        const [actividad] = await pool.query(
+            "SELECT nombre_actividad FROM actividad WHERE id_actividad = ?", 
+            [fk_id_actividad]
+        );
+        const [lote] = await pool.query(
+            "SELECT nombre FROM lotes WHERE id_lote = ?", 
+            [fk_id_lote]
+        );
+
+        if (result.affectedRows > 0) {
+            const [usuario] = usuarioExist;
+            sendNotificationToEmployee(usuario.correo, `
+                ¡Hola ${usuario.nombre}!
+                ¡Buenas noticias! Se ha programado una nueva actividad para ti.
+                Detalles de la actividad:
+                - Fecha de inicio: ${fecha_inicio}
+                - Fecha de finalización: ${fecha_fin}
+                - Actividad: ${actividad[0].nombre_actividad}
+                - Lote: ${lote[0].nombre}
+
+                ¡Estamos seguros de que harás un trabajo excelente! ¡Sigue así!
+
+                Para más información, ingresa a la App.
+            `);
+
+            return res.status(200).json({
+                status: 200,
+                message: "Se registró con éxito y notificación enviada al empleado."
+            });
+        } else {
+            return res.status(403).json({
+                status: 403,
+                message: "No se registró"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            status: 500,
+            message: error.message || "Error en el sistema"
+        });
+    }
+};
+
+
+//actualizar
+export const actualizarProgramacion = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json(errors);
+        }
+
+        const { id } = req.params;
+        const {
+            fecha_inicio,
+            fecha_fin,
+            fk_identificacion,
+            fk_id_actividad,
+            fk_id_lote,
+            estado,
+        } = req.body;
+
+        const adminId = req.usuario;
+
+        const [usuarioExist] = await pool.query(
+            "SELECT * FROM usuarios WHERE identificacion = ? AND admin_id = ?", 
+            [fk_identificacion, adminId]
+        );
+        if (usuarioExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "El usuario no existe o no está autorizado para actualizar"
+            });
+        }
+
+        const [actividadExist] = await pool.query(
+            "SELECT * FROM actividad WHERE id_actividad = ?",
+            [fk_id_actividad]
+        );
+        if (actividadExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "La actividad no existe. Registre primero una actividad."
+            });
+        }
+
+        const [cultivoExist] = await pool.query(
+            "SELECT * FROM lotes WHERE id_lote = ?",
+            [fk_id_lote]
+        );
+        if (cultivoExist.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "El lote no existe. Registre primero un lote."
+            });
+        }
+
+        const [result] = await pool.query(
+            `UPDATE programacion 
+             SET fecha_inicio = ?, fecha_fin = ?, fk_identificacion = ?, fk_id_actividad = ?, fk_id_lote = ?, estado = ? 
+             WHERE id_programacion = ? AND fk_identificacion = ?`,
+            [fecha_inicio, fecha_fin, fk_identificacion, fk_id_actividad, fk_id_lote, estado, id, fk_identificacion]
+        );
+
+        if (result.affectedRows > 0) {
+            const [actividad] = await pool.query(
+                "SELECT nombre_actividad FROM actividad WHERE id_actividad = ?", 
+                [fk_id_actividad]
+            );
+            const [lote] = await pool.query(
+                "SELECT nombre FROM lotes WHERE id_lote = ?", 
+                [fk_id_lote]
+            );
+
+            const [usuario] = usuarioExist;
+            sendNotificationToEmployee(usuario.correo, `
+                ¡Hola ${usuario.nombre}!
+                ¡Actualización importante! La actividad programada ha sido actualizada con los siguientes detalles:
+                - Nueva fecha de inicio: ${fecha_inicio}
+                - Nueva fecha de finalización: ${fecha_fin}
+                - Actividad: ${actividad[0].nombre_actividad}
+                - Lote: ${lote[0].nombre}
+
+                ¡Estamos seguros de que seguirás haciendo un trabajo excelente! ¡Sigue así!
+
+                Para más información, ingresa a la App.
+            `);
+
+            return res.status(200).json({
+                status: 200,
+                message: "Se actualizó con éxito y notificación enviada al empleado."
+            });
+        } else {
+            return res.status(404).json({
+                status: 404,
+                message: "No se encontró la programación para actualizar o no está autorizado para realizar la actualización"
+            });
+        }
+    } catch (error) {
+        return res.status (500).json({
+            status: 500,
+            message: error.message || "Error interno del servidor"
+        });
+    }
+};
+
+
 // CRUD - Listar
 export const listarProgramacion = async (req, res) => {
 	try {
@@ -174,102 +314,6 @@ export const listarProgramacion = async (req, res) => {
 		}
 	} catch (error) {
 		res.status(500).json({
-			message: error.message || "Error interno del servidor",
-		});
-	}
-};
-
-//actualizar
-export const actualizarProgramacion = async (req, res) => {
-	try {
-		// Validar los errores de la solicitud
-		const errors = validationResult(req);
-		if (!errors.isEmpty()) {
-			return res.status(400).json(errors);
-		}
-
-		// Obtener el id de la programación desde los parámetros de la solicitud
-		const { id } = req.params;
-		const {
-			fecha_inicio,
-			fecha_fin,
-			fk_identificacion,
-			fk_id_actividad,
-			fk_id_lote,
-			estado,
-		} = req.body;
-
-		// Obtener el admin_id del usuario autenticado
-		const adminId = req.usuario;
-
-		// Verificar si el usuario existe y pertenece al administrador actual
-		const [usuarioExist] = await pool.query(
-			"SELECT * FROM usuarios WHERE identificacion = ? AND admin_id = ?",
-			[fk_identificacion, adminId]
-		);
-		if (usuarioExist.length === 0) {
-			return res.status(404).json({
-				status: 404,
-				message: "El usuario no existe o no está autorizado para actualizar",
-			});
-		}
-
-		// Verificar si la actividad existe
-		const [actividadExist] = await pool.query(
-			"SELECT * FROM actividad WHERE id_actividad = ?",
-			[fk_id_actividad]
-		);
-		if (actividadExist.length === 0) {
-			return res.status(404).json({
-				status: 404,
-				message: "La actividad no existe. Registre primero una actividad.",
-			});
-		}
-
-		// Verificar si el cultivo existe
-		const [cultivoExist] = await pool.query(
-			"SELECT * FROM lotes WHERE id_lote = ?",
-			[fk_id_lote]
-		);
-		if (cultivoExist.length === 0) {
-			return res.status(404).json({
-				status: 404,
-				message: "El lote no existe. Registre primero un lote.",
-			});
-		}
-
-		// Actualizar la programación
-		const [result] = await pool.query(
-			`UPDATE programacion 
-            SET fecha_inicio = ?, fecha_fin = ?, fk_identificacion = ?, fk_id_actividad = ?,  fk_id_lote = ?, estado = ? 
-            WHERE id_programacion = ? AND fk_identificacion = ?`,
-			[
-				fecha_inicio,
-				fecha_fin,
-				fk_identificacion,
-				fk_id_actividad,
-				fk_id_lote,
-				estado,
-				id,
-				fk_identificacion,
-			]
-		);
-
-		if (result.affectedRows > 0) {
-			return res.status(200).json({
-				status: 200,
-				message: "Se actualizó con éxito",
-			});
-		} else {
-			return res.status(404).json({
-				status: 404,
-				message:
-					"No se encontró la programación para actualizar o no está autorizado para realizar la actualización",
-			});
-		}
-	} catch (error) {
-		return res.status(500).json({
-			status: 500,
 			message: error.message || "Error interno del servidor",
 		});
 	}
