@@ -37,20 +37,20 @@ export const tokenPassword = async (req, res) => {
         const mailOptions = {
             from: "karenvivianadiazguevara@gmail.com",
             to: user[0].correo,
-            subject: "Restablecer Contraseña SubCoffee",
+            subject: "Restablecer Contraseña Crop Link",
             html: `
-                <p>Querido Usuario,</p>
-                <p>Para restablecer tu contraseña, haz clic en el siguiente botón:</p>
-                <a href="http://localhost:5173/reset-password?token=${token}" style="background-color: #39A900; color: white;
+                <p>Estimado Usuario,</p>
+                <p>Hemos recibido una solicitud para restablecer tu contraseña. Para proceder, por favor haz clic en el botón a continuación:</p>
+                <a href="http://localhost:5173/reset-password?token=${token}" style="background-color: #006000; color: white;
                 padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 5px;">Restablecer Contraseña</a>
-                <p>Si no solicitaste un cambio de contraseña, por favor ignora este correo.</p>
-                <p>Saludos,<br>El equipo de SubCoffee</p>
-                <br>
+                <p>Si no has solicitado un cambio de contraseña, puedes ignorar este correo con seguridad.</p>
+                <p>Gracias,<br>El equipo de Crop Link</p>
+                <br>    
                 <img src="cid:senaLogo" alt="SENA" style="width: 100px; height: auto;">
             `,
             attachments: [{
                 filename: 'bebescabras.jpg',
-                // path: '../src/assets/bebescabras.jpg',
+                path: './public/lgoSena.png',
                 cid: 'senaLogo'
             }]
         };
