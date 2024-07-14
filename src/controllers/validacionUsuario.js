@@ -49,8 +49,8 @@ export const tokenPassword = async (req, res) => {
                 <img src="cid:senaLogo" alt="SENA" style="width: 100px; height: auto;">
             `,
             attachments: [{
-                filename: 'bebescabras.jpg',
-                path: './public/lgoSena.png',
+                filename: 'logoSena.jpg',
+                path: './public/logoSena.png',
                 cid: 'senaLogo'
             }]
         };
