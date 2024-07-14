@@ -44,8 +44,8 @@ servidor.use(rutaDeVariedad)
 servidor.use(rutaProgramacion)
 servidor.use(rutaCultivos)
 servidor.use(rutaCostos)
-servidor.use(routepassword)
-servidor.use(rutaDeRecu)    
+servidor.use("/auth",routepassword)
+servidor.use("/auth",rutaDeRecu)    
 
 //carpetas documentacion
 servidor.set('view engine', 'ejs');

@@ -12,7 +12,7 @@ export const registrarUsuarios = async (req, res) => {
       const { identificacion, nombre, apellido, correo, password, rol } = req.body;
   
       // Encriptar la contraseña
-    //   const bcryptPassword = bcrypt.hashSync(password, 12);
+//    const bcryptPassword = bcrypt.hashSync(password_user, 12);
   
       // Asignar el valor "activo" directamente al campo estado
       const estado = 'activo';

@@ -1,7 +1,7 @@
 import { pool } from "../database/conexion.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer"
+import nodemailer from "nodemailer";
 
 export const tokenPassword = async (req, res) => {
     try {
@@ -21,8 +21,8 @@ export const tokenPassword = async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: "croplink2692929@gmail.com",
-                pass: "alkp fmcf kcxx rhca" 
+                user: "karenvivianadiazguevara@gmail.com",
+                pass: "avzz nmrt wvhh kbma" 
             },
             tls: {
                 rejectUnauthorized: false
@@ -35,7 +35,7 @@ export const tokenPassword = async (req, res) => {
         }
 
         const mailOptions = {
-            from: "croplink2692929@gmail.com",
+            from: "karenvivianadiazguevara@gmail.com",
             to: user[0].correo,
             subject: "Restablecer Contraseña SubCoffee",
             html: `
@@ -50,15 +50,15 @@ export const tokenPassword = async (req, res) => {
             `,
             attachments: [{
                 filename: 'bebescabras.jpg',
-                path: '../src/assets/bebescabras.jpg',
+                // path: '../src/assets/bebescabras.jpg',
                 cid: 'senaLogo'
             }]
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.log(error);
-                return res.status(500).json({ message: "No se pudo enviar el Correo" });
+                console.log('Error al enviar el correo:', error);
+                return res.status(500).json({ message: "No se pudo enviar el Correo", error: error.message });
             }
             res.send({
                 message: "Correo enviado Exitosamente"
@@ -91,7 +91,7 @@ export const resetPassword = async (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        const sqlUpdate = "UPDATE usuarios SET password_user = ? WHERE identificacion = ?";
+        const sqlUpdate = "UPDATE usuarios SET password = ? WHERE identificacion = ?";
         const [actualizar] = await pool.query(sqlUpdate, [hashedPassword, userId]);
 
         if (actualizar.affectedRows > 0) {
