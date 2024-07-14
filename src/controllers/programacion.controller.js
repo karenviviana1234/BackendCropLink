@@ -3,6 +3,7 @@ import { validationResult } from "express-validator";
 import { sendNotificationToEmployee } from '../notifications/emailNotifications.js'; // Asegúrate de tener esta función definida en emailNotifications.js
 import cron from 'node-cron';
 
+
 // Cron job para enviar recordatorios a las 8:15 PM cada noche
 cron.schedule('15 20 * * *', async () => {
     try {
