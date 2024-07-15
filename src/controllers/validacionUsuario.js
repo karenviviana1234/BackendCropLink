@@ -21,8 +21,8 @@ export const tokenPassword = async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: "karenvivianadiazguevara@gmail.com",
-                pass: "avzz nmrt wvhh kbma" 
+                user: "croplink2692929@gmail.com",
+                pass: "w k x r l s b y n g h h a t f pgit " 
             },
             tls: {
                 rejectUnauthorized: false
@@ -35,7 +35,7 @@ export const tokenPassword = async (req, res) => {
         }
 
         const mailOptions = {
-            from: "karenvivianadiazguevara@gmail.com",
+            from: "croplink2692929@gmail.com",
             to: user[0].correo,
             subject: "Restablecer Contraseña Crop Link",
             html: `
