@@ -1,113 +1,106 @@
-import { pool } from "../database/conexion.js"
-import jwt from "jsonwebtoken"
-import nodemailer from "nodemailer"
-import bcrypt from "bcrypt"
-import dotenv from 'dotenv'
+import { pool } from "../database/conexion.js";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
 
-dotenv.config({ path: './src/env/.env' });
-
-const tokenPassword = async (peticion, respuesta) => {
+export const tokenPassword = async (req, res) => {
     try {
-        const { correo } = peticion.body;
-        const sql = "SELECT * FROM usuarios WHERE correo = ?"
-        const [user] = await pool.query(sql, correo);
+        const { correo } = req.body;
+        const sql = `SELECT * FROM usuarios WHERE correo = '${correo}'`;
+        const [user] = await pool.query(sql);
+        
         if (user.length > 0) {
             console.log(user[0].identificacion);
         } else {
-            return respuesta.status(404).json({
-                "message": "Usuario no encontrado"
-            });
+            return res.status(404).json({ message: "Usuario no encontrado" });
         }
 
-        const token = jwt.sign({ identificacion: user[0].identificacion }, process.env.AUT_SECRET, { expiresIn: process.env.AUT_EXPIRE });
-
+        const token = jwt.sign({ identificacion: user[0].identificacion }, "estemensajedebeserlargoyseguro", { expiresIn: "2h" });
+        console.log(token);
+        
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: "karenvivianadiazguevara@gmail.com",
-                pass: process.env.CORREO_PASS
+                user: "croplink2692929@gmail.com",
+                pass: "w k x r l s b y n g h h a t f pgit " 
+            },
+            tls: {
+                rejectUnauthorized: false
             }
         });
 
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: email,
-            subject: "Recuperar contraseña",
-        //     html: `
-        //     <p>Hola,</p>
-        //     <p>Da click en el siguiente botón para restablecer tu contraseña:</p>
-        //     <a href="http://localhost:5173/restablecer?token=${token}" 
-        //     style="display: inline-block; padding: 10px 20px; font-size: 16px; color: white; 
-        //     background-color: #38a800; text-decoration: none; border-radius: 5px;">Restablecer contraseña</a>
-        //     <p>Si no solicitaste un cambio de contraseña, ignora este correo.</p>
-        //   <img src="cid:imagenCorreo" alt="Descripción de la imagen" style="max-width: 200px;" />
-           
-        //     `,
-        //     attachments: [
-        //         {
-        //             filename: 'sena.png',
-        //             path: './src/public/sena.png',
-        //             cid: 'imagenCorreo' // cid debe coincidir con el src en el contenido HTML
-        //         }
-        //     ]
-             text: `Hola, da click en el siguiente enlace para restablecer la contraseña: 
-            http://localhost:5173/restablecer?token=${token}`
-            //text: ` token= ${token}`
+        // Verifica si el correo del usuario está definido y no es una cadena vacía
+        if (!user[0].correo) {
+            return res.status(400).json({ message: "Correo del usuario no definido" });
         }
+
+        const mailOptions = {
+            from: "croplink2692929@gmail.com",
+            to: user[0].correo,
+            subject: "Restablecer Contraseña Crop Link",
+            html: `
+                <p>Estimado Usuario,</p>
+                <p>Hemos recibido una solicitud para restablecer tu contraseña. Para proceder, por favor haz clic en el botón a continuación:</p>
+                <a href="http://localhost:5173/reset-password?token=${token}" style="background-color: #006000; color: white;
+                padding: 10px 20px; text-align: center; text-decoration: none; display: inline-block; border-radius: 5px;">Restablecer Contraseña</a>
+                <p>Si no has solicitado un cambio de contraseña, puedes ignorar este correo con seguridad.</p>
+                <p>Gracias,<br>El equipo de Crop Link</p>
+                <br>    
+                <img src="cid:senaLogo" alt="SENA" style="width: 100px; height: auto;">
+            `,
+            attachments: [{
+                filename: 'logoSena.jpg',
+                path: './public/logoSena.png',
+                cid: 'senaLogo'
+            }]
+        };
 
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
-                console.log(error);
-                return respuesta.status(500).json({
-                    "message": "No se pudo enviar el correo"
-                })
+                console.log('Error al enviar el correo:', error);
+                return res.status(500).json({ message: "No se pudo enviar el Correo", error: error.message });
             }
-            respuesta.send({
-                "message": "correo enviado"
-            })
-        })
+            res.send({
+                message: "Correo enviado Exitosamente"
+            });
+        });
     } catch (error) {
-        respuesta.status(500)
-        respuesta.send(error.message)
+        res.status(500);
+        res.send(error.message);
     }
-}
+};
 
-const resetPassword = async (peticion, respuesta) => {
+export const resetPassword = async (req, res) => {
     try {
-        const { token, password } = peticion.body;
+        const { token, password } = req.body;
 
-        const decoded = jwt.verify(token, process.env.SECRET);
-        const user = decoded.identificacion
+        // Verificar y decodificar el token
+        const decoded = jwt.verify(token, "estemensajedebeserlargoyseguro");
+        const userId = decoded.identificacion; 
 
-        const sql = "SELECT * FROM usuarios WHERE identificacion = ?"
-        const [usuario] = await pool.query(sql, user)
+        // Consultar el usuario por su ID
+        const sql = "SELECT * FROM usuarios WHERE identificacion = ?";
+        const [usuario] = await pool.query(sql, [userId]);
 
-        if (!usuario) {
-            return respuesta.status(404).json({
-                "message": "Usuario no encontrado"
-            })
+        if (usuario.length === 0) {
+            return res.status(404).json({
+                message: "Usuario no encontrado"
+            });
         }
 
-        // Encriptar la nueva contraseña antes de actualizarla
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-
         const sqlUpdate = "UPDATE usuarios SET password = ? WHERE identificacion = ?";
-        const [actualizar] = await pool.query(sqlUpdate, [hashedPassword, user]);
+        const [actualizar] = await pool.query(sqlUpdate, [hashedPassword, userId]);
 
         if (actualizar.affectedRows > 0) {
-            return respuesta.status(200).json({
-                "message": "Contraseña actualizada"
-            })
+            return res.status(200).json({ message: "Contraseña actualizada" });
+        } else {
+            return res.status(400).json({ message: "No se pudo actualizar la contraseña" });
         }
     } catch (error) {
-        respuesta.status(500);
-        respuesta.send(error.message);
+        console.error(error);
+        res.status(500).json({ message: "Error al restablecer la contraseña" });
     }
-}
-
-export const contraseña = {
-    tokenPassword,
-    resetPassword
-}
+};
