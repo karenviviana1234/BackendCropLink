@@ -33,7 +33,7 @@ export const RegistroTipoRecurso = async (req, res) => {
             return res.status(400).json(errors);
         }
         
-        const { nombre_recursos, cantidad_medida, unidades_medida, extras } = req.body;
+        const { nombre_recursos, cantidad_medida, unidades_medida, precio, extras } = req.body;
 
         // Obtener el admin_id del usuario que realiza el registro
         const admin_id = req.usuario;
@@ -41,7 +41,7 @@ export const RegistroTipoRecurso = async (req, res) => {
         // Asigna el estado predeterminado como "existente"
         const estado = 'existente';
 
-        const [result] = await pool.query("INSERT INTO tipo_recursos (nombre_recursos, cantidad_medida, unidades_medida, estado, extras, admin_id) VALUES (?, ?, ?, ?, ?, ?)", [nombre_recursos, cantidad_medida, unidades_medida, estado, extras, admin_id]);
+        const [result] = await pool.query("INSERT INTO tipo_recursos (nombre_recursos, cantidad_medida, unidades_medida, estado, precio, extras, admin_id) VALUES (?, ?, ?, ?, ?, ?, ?)", [nombre_recursos, cantidad_medida, unidades_medida, estado, precio, extras, admin_id]);
         
         if (result.affectedRows > 0) {
             res.status(200).json({
@@ -71,7 +71,7 @@ export const ActualizarTipoRecurso = async (req, res) => {
         }
 
         const { id } = req.params;
-        const { nombre_recursos, cantidad_medida, unidades_medida, extras } = req.body;
+        const { nombre_recursos, cantidad_medida, unidades_medida, precio, extras } = req.body;
 
         // Verifica si al menos uno de los campos está presente en la solicitud
         if (!nombre_recursos && !cantidad_medida && !unidades_medida && !extras) {
@@ -90,8 +90,8 @@ export const ActualizarTipoRecurso = async (req, res) => {
         }
 
         const [result] = await pool.query(
-            `UPDATE tipo_recursos SET nombre_recursos = ?, cantidad_medida = ?, unidades_medida = ?, extras = ? WHERE id_tipo_recursos = ?`,
-            [nombre_recursos || oldRecurso[0].nombre_recursos, cantidad_medida || oldRecurso[0].cantidad_medida, unidades_medida || oldRecurso[0].unidades_medida, extras || oldRecurso[0].extras, id]
+            `UPDATE tipo_recursos SET nombre_recursos = ?, cantidad_medida = ?, unidades_medida = ?,  precio = ?, extras = ? WHERE id_tipo_recursos = ?`,
+            [nombre_recursos || oldRecurso[0].nombre_recursos, cantidad_medida || oldRecurso[0].cantidad_medida, unidades_medida || oldRecurso[0].unidades_medida, precio || oldRecurso[0].precio, extras || oldRecurso[0].extras, id] 
         );
 
         if (result.affectedRows > 0) {

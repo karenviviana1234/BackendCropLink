@@ -1,5 +1,106 @@
 import { pool } from "../database/conexion.js";
 import { validationResult } from "express-validator";
+import nodemailer from 'nodemailer';
+
+//falta el de cargar imagen
+
+
+
+
+// Configurar nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // Usa el servicio de Gmail, que configura el host y el puerto automáticamente
+  auth: {
+    user: process.env.CORREO_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
+
+
+export const RegistrarE = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log('Validation errors:', errors);
+      return res.status(400).json(errors);
+    }
+
+    const { id_actividad } = req.params;
+    const { observacion } = req.body;
+
+    // Verificar si se proporcionó una observación
+    if (!observacion) {
+      return res.status(400).json({
+        status: 400,
+        message: "La observación es requerida.",
+      });
+    }
+
+    console.log('Actualizando observación:', observacion, 'para id:', id_actividad);
+
+    // Actualizar la observación en la tabla de actividad
+    const [resultActividad] = await pool.query(
+      `UPDATE actividad SET observacion = ? WHERE id_actividad = ?`,
+      [observacion, id_actividad]
+    );
+
+    console.log('Resultado de la actualización:', resultActividad);
+
+    if (resultActividad.affectedRows > 0) {
+      // Obtener el email del administrador
+      const [resultAdmin] = await pool.query(
+        `SELECT correo FROM usuarios WHERE identificacion = (SELECT admin_id FROM actividad WHERE id_actividad = ?)`,
+        [id_actividad]  
+      );
+
+      if (resultAdmin.length > 0) {
+        const adminEmail = resultAdmin[0].correo;
+
+        console.log('Resultado de la actualización:', adminEmail);
+        // Enviar correo electrónico al administrador
+        const mailOptions = {
+          from: process.env.CORREO_USER,
+          to: adminEmail,
+          subject: 'Actualización de Observación en Actividad',
+          text: `La actividad con ID ${id_actividad} ha sido actualizada con la siguiente observación:\n\n${observacion}`,
+        };
+
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.error('Error al enviar el correo:', error);
+            return res.status(500).json({
+              status: 500,
+              message: 'No se pudo enviar el correo electrónico.',
+            });
+          } else {
+            console.log('Correo enviado:', info.response);
+            return res.status(200).json({
+              status: 200,
+              message: 'Se actualizó la observación en la actividad con éxito y se envió el correo al administrador.',
+            });
+          }
+        });
+      } else {
+        return res.status(404).json({
+          status: 404,
+          message: 'No se encontró el correo electrónico del administrador.',
+        });
+      }
+    } else {
+      return res.status(403).json({
+        status: 403,
+        message: "No se pudo actualizar la observación en la Actividad",
+      });
+    }
+  } catch (error) {
+    console.error('Error al actualizar la observación:', error);
+    return res.status(500).json({
+      status: 500,
+      message: error.message || "Error en el sistema",
+    });
+  }
+};
+
 
 export const listarEmpleado = async (req, res) => {
   try {
@@ -53,58 +154,6 @@ export const listarEmpleado = async (req, res) => {
     });
   }
 };
-
-
-export const RegistrarE = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors);
-      return res.status(400).json(errors);
-    }
-
-    const { id_actividad } = req.params;
-    const { observacion } = req.body;
-
-    // Verificar si se proporcionó una observación
-    if (!observacion) {
-      return res.status(400).json({
-        status: 400,
-        message: "La observación es requerida.",
-      });
-    }
-
-    console.log('Actualizando observación:', observacion, 'para id:', id_actividad);
-
-    // Actualizar la observación en la tabla de actividad
-    const [resultActividad] = await pool.query(
-      `UPDATE actividad SET observacion = ? WHERE id_actividad = ?`,
-      [observacion, id_actividad]
-    );
-
-    console.log('Resultado de la actualización:', resultActividad);
-
-    if (resultActividad.affectedRows > 0) {
-      return res.status(200).json({
-        status: 200,
-        message: "Se actualizó la observación en la actividad con éxito",
-      });
-    } else {
-      return res.status(403).json({
-        status: 403,
-        message: "No se pudo actualizar la observación en la Actividad",
-      });
-    }
-  } catch (error) {
-    console.error('Error al actualizar la observación:', error);
-    return res.status(500).json({
-      status: 500,
-      message: error.message || "Error en el sistema",
-    });
-  }
-};
-
-
 
 //
 

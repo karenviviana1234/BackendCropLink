@@ -17,6 +17,7 @@ import rutaCostos from './src/routes/Costos.routes.js'
 import routepassword from './src/routes/validacionUsuario.route.js'
 import { rutaDeRecu } from './src/routes/recuperacio.route.js'
 
+import fileupload from 'express-fileupload'
 
 //servidor
 const servidor = express()
@@ -46,6 +47,12 @@ servidor.use(rutaCultivos)
 servidor.use(rutaCostos)
 servidor.use("/auth",routepassword)
 servidor.use("/auth",rutaDeRecu)    
+
+// imagenes
+servidor.use(fileupload({
+    createParentPath:true
+}))
+
 
 //carpetas documentacion
 servidor.set('view engine', 'ejs');
