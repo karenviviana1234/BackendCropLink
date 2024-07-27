@@ -1,9 +1,44 @@
 import { pool } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 import nodemailer from 'nodemailer';
+import upload from "../controllers/carga.Img.js";
+// Cargar imagen
+export const registrarEvidencia = async (req, res) => {
+  try {
+    const { idActividad } = req.params;
+    const files = req.files;
 
-//falta el de cargar imagen
+    if (!files || files.length === 0) {
+      return res.status(400).json({ message: 'No se han subido imágenes' });
+    }
 
+    const evidencias = files.map(file => file.path);
+
+    // Consulta SQL para actualizar la columna `evidencia` en la tabla `actividad`
+    const updateQuery = 'UPDATE actividad SET evidencia = CONCAT_WS(\',\', evidencia, ?) WHERE id_actividad = ?';
+    await pool.query(updateQuery, [evidencias.join(','), idActividad]);
+
+    // Consulta para obtener los datos actualizados
+    const selectQuery = 'SELECT evidencia FROM actividad WHERE id_actividad = ?';
+    const [rows] = await pool.query(selectQuery, [idActividad]);
+
+    if (rows.length > 0) {
+      res.status(200).json({
+        message: 'Evidencia registrada correctamente',
+        evidencias: rows[0].evidencia
+      });
+    } else {
+      res.status(404).json({
+        message: 'No se encontró la actividad especificada'
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: error.message || 'Error interno del servidor'
+    });
+  }
+};
 
 
 
@@ -17,7 +52,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-export const RegistrarE = async (req, res) => {
+ export const RegistrarE = async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -27,6 +62,7 @@ export const RegistrarE = async (req, res) => {
 
     const { id_actividad } = req.params;
     const { observacion } = req.body;
+    const usuarioId = req.usuario; // Asumiendo que req.usuario tiene el identificador del usuario que está enviando la observación
 
     // Verificar si se proporcionó una observación
     if (!observacion) {
@@ -47,22 +83,31 @@ export const RegistrarE = async (req, res) => {
     console.log('Resultado de la actualización:', resultActividad);
 
     if (resultActividad.affectedRows > 0) {
-      // Obtener el email del administrador
-      const [resultAdmin] = await pool.query(
-        `SELECT correo FROM usuarios WHERE identificacion = (SELECT admin_id FROM actividad WHERE id_actividad = ?)`,
-        [id_actividad]  
+      // Obtener el nombre del usuario que está enviando la observación
+      const [resultUsuario] = await pool.query(
+        `SELECT nombre FROM usuarios WHERE identificacion = ?`,
+        [usuarioId]
       );
 
-      if (resultAdmin.length > 0) {
-        const adminEmail = resultAdmin[0].correo;
+      // Obtener detalles de la actividad y el email del administrador
+      const [resultDetalles] = await pool.query(
+        `SELECT a.nombre_actividad, u.correo AS admin_email, u.nombre AS nombre_administrador
+         FROM actividad a
+         INNER JOIN usuarios u ON a.admin_id = u.identificacion
+         WHERE a.id_actividad = ?`,
+        [id_actividad]
+      );
 
-        console.log('Resultado de la actualización:', adminEmail);
+      if (resultDetalles.length > 0 && resultUsuario.length > 0) {
+        const { nombre_actividad, admin_email: adminEmail, nombre_administrador } = resultDetalles[0];
+        const { nombre: nombre_usuario } = resultUsuario[0];
+
         // Enviar correo electrónico al administrador
         const mailOptions = {
           from: process.env.CORREO_USER,
           to: adminEmail,
           subject: 'Actualización de Observación en Actividad',
-          text: `La actividad con ID ${id_actividad} ha sido actualizada con la siguiente observación:\n\n${observacion}`,
+          text: `Hola ${nombre_administrador},\n\nTu empleado ${nombre_usuario} ha finalizado su asignación con la siguiente actividad:\n\nID de Actividad: ${id_actividad}\nNombre de Actividad: ${nombre_actividad}\nObservación: ${observacion}\n\nPara más información, verifica la aplicación CropLink.\n\nSaludos,\nEl equipo de CropLink`,
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -83,7 +128,7 @@ export const RegistrarE = async (req, res) => {
       } else {
         return res.status(404).json({
           status: 404,
-          message: 'No se encontró el correo electrónico del administrador.',
+          message: 'No se encontraron los detalles necesarios para enviar el correo.',
         });
       }
     } else {
@@ -99,7 +144,10 @@ export const RegistrarE = async (req, res) => {
       message: error.message || "Error en el sistema",
     });
   }
-};
+}; 
+
+
+
 
 
 export const listarEmpleado = async (req, res) => {
@@ -122,6 +170,7 @@ export const listarEmpleado = async (req, res) => {
             a.nombre_actividad,
             a.tiempo,
             a.observaciones,
+            a.evidencia,
             p.estado
         FROM 
             programacion p
