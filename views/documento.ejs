@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="./img/logosubcoffe.png" />
+    <link href="/public/style.css" rel="stylesheet" type="text/css" />
+    <title>Documentación de API</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            padding: 20px 30px;
+        }
+        h3 {
+            padding: 15px 0;
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f8f8;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        caption {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>  
+    </head>
+  <body>
+    <h1>Documentación de API</h1>
+    <%- include('./validacion.ejs') %> 
+    <%- include('./Usuariodocument.ejs') %> 
+    <%- include('./Actividaddocument.ejs') %>
+    <%- include('./Empleadoducemnt.ejs') %> 
+    <%- include('./Fincadocument.ejs') %> 
+    <%- include('./Lotesdocument.ejs') %> 
+    <%- include('./Producciondocument.ejs') %> 
+    <%- include('./Programaciondocument.ejs') %> 
+    <%- include('./TipoRecursodocument.ejs') %>
+    <%- include('./Variedaddocument.ejs') %>
+   
+  </body>
+</html>

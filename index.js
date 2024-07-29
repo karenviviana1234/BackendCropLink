@@ -58,7 +58,7 @@ servidor.use(fileupload({
 servidor.set('view engine', 'ejs');
 servidor.set('views','./views');
 servidor.get('/documents',(req,res)=>{
-    res.render('document.ejs');
+    res.render('documento.ejs');
 })
 servidor.use(express.static('./public'));
 
