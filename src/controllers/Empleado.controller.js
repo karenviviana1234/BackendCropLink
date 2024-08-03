@@ -1,46 +1,6 @@
 import { pool } from "../database/conexion.js";
 import { validationResult } from "express-validator";
 import nodemailer from 'nodemailer';
-import upload from "../controllers/carga.Img.js";
-// Cargar imagen
-export const registrarEvidencia = async (req, res) => {
-  try {
-    const { idActividad } = req.params;
-    const files = req.files;
-
-    if (!files || files.length === 0) {
-      return res.status(400).json({ message: 'No se han subido imágenes' });
-    }
-
-    const evidencias = files.map(file => file.path);
-
-    // Consulta SQL para actualizar la columna `evidencia` en la tabla `actividad`
-    const updateQuery = 'UPDATE actividad SET evidencia = CONCAT_WS(\',\', evidencia, ?) WHERE id_actividad = ?';
-    await pool.query(updateQuery, [evidencias.join(','), idActividad]);
-
-    // Consulta para obtener los datos actualizados
-    const selectQuery = 'SELECT evidencia FROM actividad WHERE id_actividad = ?';
-    const [rows] = await pool.query(selectQuery, [idActividad]);
-
-    if (rows.length > 0) {
-      res.status(200).json({
-        message: 'Evidencia registrada correctamente',
-        evidencias: rows[0].evidencia
-      });
-    } else {
-      res.status(404).json({
-        message: 'No se encontró la actividad especificada'
-      });
-    }
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      message: error.message || 'Error interno del servidor'
-    });
-  }
-};
-
-
 
 // Configurar nodemailer
 const transporter = nodemailer.createTransport({
@@ -51,13 +11,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
- export const RegistrarE = async (req, res) => {
+export const RegistrarE = async (req, res) => {
   try {
+    // Verificar si hay errores de validación
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       console.log('Validation errors:', errors);
-      return res.status(400).json(errors);
+      return res.status(400).json({
+        status: 400,
+        message: 'Error de validación',
+        errors: errors.array()
+      });
     }
 
     const { id_actividad } = req.params;
@@ -144,7 +108,7 @@ const transporter = nodemailer.createTransport({
       message: error.message || "Error en el sistema",
     });
   }
-}; 
+};
 
 
 
@@ -170,7 +134,6 @@ export const listarEmpleado = async (req, res) => {
             a.nombre_actividad,
             a.tiempo,
             a.observaciones,
-            a.evidencia,
             p.estado
         FROM 
             programacion p
